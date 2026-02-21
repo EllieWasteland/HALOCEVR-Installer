@@ -226,7 +226,7 @@
         {
           "title": "4. VR AUTO-INSTALLER",
           "desc": "Modification tool.",
-          "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary SPV3 and Chimera patches.",
+          "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary files for the VR MOD.",
           "isDownload": true,
           "showSkip": true,
           "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe",
