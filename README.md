@@ -6,11 +6,9 @@
 ![Game](https://img.shields.io/badge/game-Halo%20CE%20%2F%20PC-00A36C?style=for-the-badge)
 ![Status](https://img.shields.io/badge/status-Active%20Development-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
-![Release](https://img.shields.io/https://github.com/EllieWasteland/HALOCEVR-Installer?style=for-the-badge&color=orange)
-
 **An automated, single-click installer designed to fully configure Virtual Reality support for Halo: Combat Evolved.**
 
-[Download Latest Release](#) · [Report a Bug](#) · [Request a Feature](#)
+[Download Latest Release](https://github.com/EllieWasteland/HALOCEVR-Installer/releases/) · [Report a Bug](#) · [Request a Feature](#)
 
 </div>
 
