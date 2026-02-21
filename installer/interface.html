@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNSC | HALO CE VR INSTALLER</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;600&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* Vars & Base */
+        :root {
+            --bg-deep: #050505;
+            --halo-white: #ffffff;
+            --halo-grey: #a1a1aa;
+            --terminal-green: #a8ffaa;
+            --terminal-red: #ff5555;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--halo-white);
+            font-family: 'Barlow', 'Rajdhani', sans-serif;
+            overflow: hidden; margin: 0; height: 100vh; width: 100vw;
+            user-select: none; cursor: default;
+        }
+
+        .font-tech { font-family: 'Rajdhani', monospace; font-weight: 600; }
+
+        /* Background & FX */
+        #video-bg-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -10; background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); 
+        }
+
+        #bg-image {
+            width: 100%; height: 100%; 
+            background-size: cover; background-position: center;
+            filter: brightness(0.25) desaturate(0.6) contrast(1.2);
+            transition: filter 1s ease;
+        }
+
+        .video-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at left, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.95) 100%); z-index: 1;
+        }
+
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 3px; z-index: 90; pointer-events: none; opacity: 0.15;
+        }
+
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 89; opacity: 0.03; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        /* Animations */
+        @keyframes slideInRight { 0% { opacity: 0; transform: translateX(30px); } 100% { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes pingSlow { 75%, 100% { transform: scale(2); opacity: 0; } }
+        @keyframes pingSlower { 75%, 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes reactorSurge {
+            0% { transform: scale(1); opacity: 0.9; border-width: 2px; border-color: white; }
+            100% { transform: scale(50); opacity: 0; border-width: 0px; border-color: white; }
+        }
+        
+        .anim-slide-in { animation: slideInRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
+        .anim-fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+        .delay-1 { animation-delay: 100ms; }
+        .delay-2 { animation-delay: 200ms; }
+        .delay-3 { animation-delay: 300ms; }
+        .animate-ping-slow { animation: pingSlow 3s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .animate-ping-slower { animation: pingSlower 4s cubic-bezier(0, 0, 0.2, 1) infinite; animation-delay: 1s; }
+
+        .reactor-mode .ripple-ring { animation: reactorSurge 0.6s cubic-bezier(0.1, 0.5, 0.1, 1) infinite !important; }
+        .reactor-mode .ripple-ring:nth-child(2) { animation-delay: 0.0s !important; }
+        .reactor-mode .ripple-ring:nth-child(3) { animation-delay: 0.1s !important; }
+        .reactor-mode .ripple-ring:nth-child(4) { animation-delay: 0.2s !important; }
+        .reactor-mode .ripple-ring:nth-child(5) { animation-delay: 0.3s !important; }
+        .reactor-mode .ripple-ring:nth-child(6) { animation-delay: 0.4s !important; }
+        .reactor-mode .ripple-ring:nth-child(7) { animation-delay: 0.5s !important; }
+
+        /* UI Components */
+        .step-title {
+            font-size: 3.5rem; font-weight: 300; margin-bottom: 0.5rem; line-height: 1;
+            color: #fff; text-transform: uppercase; letter-spacing: 0.05em;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .step-desc {
+            font-size: 1rem; font-weight: 300; color: var(--halo-grey);
+            margin-bottom: 2rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;
+        }
+
+        .btn-action {
+            background: var(--halo-white); color: #000;
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem;
+            padding: 0.8rem 3rem; border: none; cursor: pointer;
+            transition: transform 0.2s; display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .btn-action:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(255,255,255,0.4); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-ghost {
+            background: transparent; color: var(--halo-white);
+            border: 1px solid rgba(255,255,255,0.3); padding: 0.7rem 1.5rem;
+            cursor: pointer; font-family: 'Rajdhani', monospace; text-transform: uppercase;
+            font-size: 0.8rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        
+        .btn-cancel {
+            background: rgba(255,255,255,0.05); color: var(--halo-white);
+            font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.8rem;
+            padding: 0.6rem 1.5rem; border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: 0.1em;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        .btn-cancel:hover {
+            background: rgba(255, 85, 85, 0.15); border-color: var(--terminal-red); color: var(--terminal-red);
+            transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 85, 85, 0.2);
+        }
+
+        .btn-lang {
+            width: 100%; text-align: left; padding: 1.5rem;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .btn-lang:hover { background: rgba(255,255,255,0.15); border-color: var(--halo-white); }
+
+        /* Layout & Terminals */
+        .main-layout {
+            display: grid; grid-template-columns: 1fr 0.8fr; height: 100vh;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease; position: relative;
+        }
+        .panel-content {
+            padding: 4rem 6rem; display: flex; flex-direction: column; justify-content: center;
+            background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); z-index: 10;
+        }
+        .panel-visual { display: flex; align-items: center; justify-content: center; position: relative; }
+
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease;
+        }
+        .log-line {
+            color: var(--halo-white); font-size: 0.8rem; width: 100%;
+            margin-bottom: 5px; opacity: 0; animation: slideInRight 0.2s forwards;
+        }
+
+        .terminal-box {
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Share Tech Mono', monospace; padding: 1rem; margin-top: 1rem;
+            height: 120px; overflow-y: auto; font-size: 0.8rem; color: #888;
+            display: flex; flex-direction: column-reverse;
+        }
+        
+        .progress-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
+        .progress-bar-fill {
+            height: 100%; width: 0%; background: var(--halo-white);
+            box-shadow: 0 0 10px var(--halo-white); transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="video-bg-container">
+        <div id="bg-image" style="background-image: url('https://wallpapercave.com/wp/wp6297403.jpg');"></div>
+        <div class="video-overlay"></div>
+    </div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <div id="boot-screen">
+        <div id="boot-logs" class="w-full max-w-lg flex flex-col gap-1 items-start font-tech text-xs md:text-sm text-zinc-400"></div>
+        <div class="mt-8"><i class="ph ph-spinner animate-spin text-white text-2xl"></i></div>
+        <div class="mt-2 text-white font-tech text-xs tracking-[0.3em] animate-pulse">SYSTEM INITIALIZATION</div>
+    </div>
+
+    <!-- Intro Effect Transition Screen -->
+    <div id="intro-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-1000 opacity-0">
+        <div id="intro-visual" class="relative flex items-center justify-center">
+            <div id="intro-btn-circle" class="w-24 h-24 rounded-full bg-black border border-white/30 backdrop-blur-md flex items-center justify-center relative z-20 transition-colors duration-500">
+                <i id="intro-icon" class="ph ph-fingerprint text-3xl text-white/50 transition-colors"></i>
+            </div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/20 animate-ping-slow z-10 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/10 animate-ping-slower z-0 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full bg-white/5 animate-pulse z-0 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/15 animate-ping-slow z-0 pointer-events-none" style="animation-delay: 0.5s"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/5 animate-ping-slower z-0 pointer-events-none" style="animation-delay: 1.5s"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/10 animate-ping-slow z-0 pointer-events-none" style="animation-delay: 0.8s"></div>
+        </div>
+    </div>
+
+    <div id="main-interface" class="main-layout">
+        
+        <!-- Botón de Cancelar / Cerrar App -->
+        <button onclick="triggerPythonAction('close')" class="btn-cancel absolute top-8 right-8 z-50 backdrop-blur-md shadow-lg" title="Cancelar Instalación">
+            <i class="ph ph-x text-lg"></i>
+            <span id="btn-cancel-text">CANCELAR</span>
+        </button>
+
+        <div class="panel-content">
+            <div class="absolute top-8 left-8 md:left-24 flex items-center gap-4 opacity-50">
+                <i class="ph ph-list text-white text-xl"></i>
+                <div class="h-[1px] w-12 bg-white"></div>
+                <span class="text-white font-tech text-xs tracking-widest">UNSC // INSTALLER UTILITY</span>
+            </div>
+
+            <div id="content-container"></div>
+
+            <div class="absolute bottom-8 left-8 md:left-24 font-tech text-[10px] text-white/30 tracking-[0.2em] flex gap-4">
+                <span id="sys-id">ID: UNSC-SYS // V1.4</span>
+                <span id="sys-status">STATUS: ONLINE</span>
+            </div>
+        </div>
+
+        <div class="panel-visual hidden md:flex">
+            <div class="absolute w-[500px] h-[500px] border border-white/5 rounded-full animate-[spin_60s_linear_infinite]"></div>
+            <div class="absolute w-[350px] h-[350px] border border-white/10 rounded-full border-dashed animate-[spin_40s_linear_infinite_reverse]"></div>
+            
+            <div id="visual-icon-wrapper" class="relative z-10 transition-all duration-500 drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                <i id="visual-icon" class="ph ph-globe text-[120px] text-white"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            es: {
+                lang_title: "IDIOMA / LANGUAGE", lang_sub: "CONFIGURACIÓN INICIAL", lang_desc: "Seleccione el idioma preferido para la interfaz del instalador.",
+                splash_title: "HALO CE VR", splash_sub: "UTILIDAD DE INSTALACIÓN", splash_desc: "Este sistema automatizado configurará los componentes necesarios para la realidad virtual en Halo: Combat Evolved. Asegúrese de tener una copia limpia del juego.", btn_start: "INICIAR PROCESO",
+                folder_title: "UBICACIÓN", folder_sub: "DIRECTORIO RAÍZ", folder_desc: "Seleccione la carpeta donde está instalado 'Halo Custom Edition' o 'Halo PC' (asegúrese de haberlo instalado vía Steam o disco original). El sistema buscará 'halo.exe'.", btn_select: "SELECCIONAR RUTA",
+                credits_title: "CRÉDITOS", credits_sub: "COMUNIDAD MODDING", credits_desc: "Este instalador es posible gracias al trabajo increíble de desarrolladores independientes. Apoya a los creadores originales visitando sus repositorios.", btn_thanks: "GRACIAS Y CONTINUAR",
+                core_title: "NÚCLEO VR", core_sub: "FASE 1 DE 4", core_desc: "Instalación del motor de renderizado VR y actualización del ejecutable a la versión 1.0.10. Fundamental para la estereoscopía.", loading_core: "DESCARGANDO RECURSOS...",
+                chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 4", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
+                laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 4", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
+                audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 4", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
+                final_title: "COMPLETADO", final_sub: "SISTEMA LISTO", final_desc: "Todos los componentes han sido instalados correctamente. Se ha generado un archivo de registro .txt en la carpeta de tu juego. Puedes cerrar el instalador e iniciar el juego desde tu visor.", btn_close: "CERRAR INSTALADOR",
+                btn_install: "INSTALAR", btn_skip: "OMITIR", btn_cancel: "CANCELAR INSTALACIÓN", status_wait: "Esperando comando..."
+            },
+            en: {
+                lang_title: "LANGUAGE / IDIOMA", lang_sub: "INITIAL SETUP", lang_desc: "Select your preferred language for the installer interface.",
+                splash_title: "HALO CE VR", splash_sub: "INSTALLATION UTILITY", splash_desc: "This automated system will configure the necessary components for Virtual Reality in Halo: Combat Evolved. Ensure you have a clean copy of the game.", btn_start: "START PROCESS",
+                folder_title: "LOCATION", folder_sub: "ROOT DIRECTORY", folder_desc: "Select the folder where 'Halo Custom Edition' or 'Halo PC' is installed (ensure it's installed via Steam or original disc). The system will look for 'halo.exe'.", btn_select: "SELECT PATH",
+                credits_title: "CREDITS", credits_sub: "MODDING COMMUNITY", credits_desc: "This installer is made possible by the incredible work of independent developers. Please support the original creators by checking out their repositories.", btn_thanks: "THANKS & CONTINUE",
+                core_title: "VR CORE", core_sub: "PHASE 1 OF 4", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
+                chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 4", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
+                laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 4", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
+                audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 4", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
+                final_title: "COMPLETE", final_sub: "SYSTEM READY", final_desc: "All components have been successfully installed. A .txt log file has been generated in your game folder. You may close the installer and launch the game from your headset.", btn_close: "CLOSE INSTALLER",
+                btn_install: "INSTALL", btn_skip: "SKIP", btn_cancel: "CANCEL INSTALLATION", status_wait: "Waiting for command..."
+            }
+        };
+
+        const FLOW = ['splash', 'folder', 'credits', 'core', 'chimera', 'laa', 'audio', 'final'];
+        let currentLang = 'en';
+        let currentStepKey = 'language';
+        let isProcessing = false;
+
+        window.addEventListener('load', runBootSequence);
+
+        function runBootSequence() {
+            const logs = ["INITIALIZING KERNEL...", "CHECKING INTEGRITY...", "LOADING INTERFACE MODULES...", "SYSTEM READY."];
+            const logContainer = document.getElementById('boot-logs');
+            let delay = 0;
+
+            logs.forEach((log, i) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'log-line';
+                    div.innerText = `> ${log}`;
+                    logContainer.appendChild(div);
+                    if(i === logs.length - 1) setTimeout(revealInterface, 800);
+                }, delay);
+                delay += 300;
+            });
+        }
+
+        function revealInterface() {
+            document.getElementById('boot-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.display = 'none';
+                document.getElementById('main-interface').style.opacity = '1';
+                document.getElementById('main-interface').style.pointerEvents = 'all';
+                renderStep('language');
+            }, 800);
+        }
+
+        async function transitionContent(updateFunction) {
+            const container = document.getElementById('content-container');
+            const visual = document.getElementById('visual-icon-wrapper');
+
+            if (container.innerHTML.trim() !== "") {
+                container.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                container.style.opacity = '0';
+                container.style.transform = 'translateX(-30px)';
+
+                if(visual) {
+                    visual.style.transition = 'all 0.3s ease';
+                    visual.style.opacity = '0';
+                    visual.style.transform = 'scale(0.8)';
+                }
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            updateFunction();
+
+            container.style.transition = 'none';
+            container.style.opacity = '1'; 
+            
+            if(visual) {
+                visual.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                visual.style.opacity = '1';
+                visual.style.transform = 'scale(1)';
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            const cancelText = document.getElementById('btn-cancel-text');
+            if (cancelText) cancelText.innerText = i18n[lang].btn_cancel;
+
+            const mainInt = document.getElementById('main-interface');
+            const introScreen = document.getElementById('intro-screen');
+            const introVisual = document.getElementById('intro-visual');
+            const introIcon = document.getElementById('intro-icon');
+            const bgImage = document.getElementById('bg-image');
+
+            mainInt.style.opacity = '0';
+            mainInt.style.pointerEvents = 'none';
+            introScreen.classList.remove('hidden');
+
+            setTimeout(() => {
+                introScreen.style.opacity = '1';
+                
+                setTimeout(() => {
+                    introVisual.classList.add('reactor-mode');
+                    introIcon.classList.add('animate-pulse');
+                    introIcon.style.color = 'white';
+                    bgImage.style.filter = 'brightness(0.5) desaturate(0.4) contrast(1.2)';
+
+                    setTimeout(() => {
+                        introScreen.style.opacity = '0';
+                        transitionContent(() => renderStep('splash'));
+                        
+                        setTimeout(() => {
+                            introScreen.classList.add('hidden');
+                            mainInt.style.opacity = '1';
+                            mainInt.style.pointerEvents = 'all';
+                            introVisual.classList.remove('reactor-mode');
+                        }, 1000);
+                    }, 1500);
+                }, 500);
+            }, 50);
+        }
+
+        function openUrl(url) {
+            if (window.pywebview) {
+                window.pywebview.api.open_url(url);
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+
+        function renderStep(key) {
+            currentStepKey = key;
+            const container = document.getElementById('content-container');
+            const visualIcon = document.getElementById('visual-icon');
+
+            if (key === 'language') {
+                visualIcon.className = `ph ph-globe text-[120px] text-white anim-slide-in`;
+                container.innerHTML = `
+                    <div class="anim-slide-in delay-1">
+                        <h2 class="text-white/60 font-tech text-sm tracking-[0.4em] mb-2 uppercase">INITIAL SETUP</h2>
+                        <h1 class="step-title">LANGUAGE</h1>
+                        <div class="h-[2px] w-24 bg-white mb-6 shadow-[0_0_15px_white]"></div>
+                        <p class="step-desc max-w-lg">Select your preferred language / Seleccione su idioma.</p>
+                    </div>
+                    <div class="mt-8 flex flex-col gap-4 w-full max-w-sm anim-slide-in delay-2">
+                        <button onclick="setLanguage('en')" class="btn-lang">
+                            <span class="font-tech text-xl tracking-widest block">ENGLISH</span>
+                            <span class="text-xs text-zinc-500">DEFAULT INTERFACE</span>
+                        </button>
+                        <button onclick="setLanguage('es')" class="btn-lang">
+                            <span class="font-tech text-xl tracking-widest block">ESPAÑOL</span>
+                            <span class="text-xs text-zinc-500">INTERFAZ EN ESPAÑOL</span>
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Si llegamos al final, invocamos la generación del archivo txt
+            if (key === 'final' && window.pywebview) {
+                window.pywebview.api.generate_log(currentLang);
+            }
+
+            const text = i18n[currentLang];
+            const meta = {
+                splash: { icon: "ph-fingerprint", action: null },
+                folder: { icon: "ph-folder-notch-open", action: "selectFolder" },
+                credits: { icon: "ph-users", action: null }, // Nueva meta
+                core: { icon: "ph-cube", action: "installCore" },
+                chimera: { icon: "ph-aperture", action: "installChimera", skip: true },
+                laa: { icon: "ph-memory", action: "installLAA", skip: true },
+                audio: { icon: "ph-speaker-high", action: "installAudio", skip: true },
+                final: { icon: "ph-check-circle", action: "finish" }
+            };
+
+            const data = meta[key];
+            visualIcon.className = `ph ${data.icon} text-[120px] text-white anim-slide-in`;
+            
+            const title = text[`${key}_title`];
+            const sub = text[`${key}_sub`];
+            const desc = text[`${key}_desc`];
+            const loadingTxt = text[`loading_${key}`] || "PROCESSING...";
+
+            let html = `
+                <div class="anim-slide-in delay-1">
+                    <h2 class="text-white/60 font-tech text-sm tracking-[0.4em] mb-2 uppercase">${sub}</h2>
+                    <h1 class="step-title">${title}</h1>
+                    <div class="h-[2px] w-24 bg-white mb-6 shadow-[0_0_15px_white]"></div>
+                    <p class="step-desc max-w-lg">${desc}</p>
+                </div>
+            `;
+
+            // Pantalla de créditos única
+            if (key === 'credits') {
+                html += `
+                    <div class="grid grid-cols-2 gap-3 w-full max-w-lg mb-8 anim-slide-in delay-2">
+                        <div onclick="openUrl('https://github.com/LivingFray/HaloCEVR')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-white font-tech text-lg">HaloCEVR</span>
+                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <div class="text-white/50 text-xs">by LivingFray</div>
+                        </div>
+                        <div onclick="openUrl('https://github.com/SnowyMouse/chimera')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-white font-tech text-lg">Chimera</span>
+                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <div class="text-white/50 text-xs">by SnowyMouse</div>
+                        </div>
+                        <div onclick="openUrl('https://github.com/dwood15/Horizon')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-white font-tech text-lg">HoriZon</span>
+                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <div class="text-white/50 text-xs">Community Tool</div>
+                        </div>
+                        <div onclick="openUrl('https://github.com/ThreeDeeJay/dsoal')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-white font-tech text-lg">Audio 3D (DSOAL)</span>
+                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <div class="text-white/50 text-xs">by ThreeDeeJay</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 anim-slide-in delay-3">
+                        <button onclick="transitionContent(() => renderStep('core'))" class="btn-action w-full justify-center">${text.btn_thanks}</button>
+                    </div>
+                `;
+                container.innerHTML = html;
+                return;
+            }
+
+            // Flujo estándar para las demás pantallas
+            html += `<div class="mt-8 flex gap-4 anim-slide-in delay-2">`;
+            
+            if (key === 'splash') {
+                html += `<button onclick="transitionContent(() => renderStep('folder'))" class="btn-action group"><span>${text.btn_start}</span><i class="ph ph-caret-right ml-2 group-hover:translate-x-1 transition-transform"></i></button>`;
+            } else if (key === 'folder') {
+                html += `<div class="flex flex-col gap-4 w-full max-w-md"><button onclick="triggerPythonAction('selectFolder')" class="btn-action w-full">${text.btn_select}</button><div id="path-display" class="font-mono text-xs text-white/50 border border-white/10 p-2 hidden"></div></div>`;
+            } else if (key === 'final') {
+                html += `<button onclick="triggerPythonAction('close')" class="btn-action">${text.btn_close}</button>`;
+            } else {
+                if(!isProcessing) {
+                    html += `<button id="btn-main-action" onclick="triggerPythonAction('${data.action}')" class="btn-action">${text.btn_install}</button>`;
+                    if (data.skip) html += `<button onclick="skipStep('${key}')" class="btn-ghost">${text.btn_skip}</button>`;
+                }
+            }
+            html += `</div>`;
+
+            html += `
+                <div id="processing-area" class="hidden mt-6 w-full max-w-md anim-slide-in">
+                    <div class="flex justify-between items-end mb-1">
+                        <span class="font-tech text-xs tracking-widest text-white/70 uppercase" id="loading-label">${loadingTxt}</span>
+                        <span class="font-mono text-xs text-white" id="progress-text">0%</span>
+                    </div>
+                    <div class="progress-bar-container"><div id="progress-fill" class="progress-bar-fill"></div></div>
+                    <div id="terminal-logs" class="terminal-box"><div class="text-white/30">> ${text.status_wait}</div></div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function triggerPythonAction(actionName) {
+            if (actionName === 'close') {
+                window.pywebview ? window.pywebview.api.quit_app() : window.close();
+                return;
+            }
+
+            if (actionName === 'selectFolder') {
+                if (window.pywebview) {
+                    window.pywebview.api.select_folder().then(path => {
+                        if (path) {
+                            const disp = document.getElementById('path-display');
+                            disp.innerText = "> " + path;
+                            disp.classList.remove('hidden');
+                            disp.classList.add('text-green-400');
+                            // Redirigir hacia créditos en lugar de 'core' directamente
+                            setTimeout(() => transitionContent(() => renderStep('credits')), 1000);
+                        }
+                    });
+                } else {
+                    const disp = document.getElementById('path-display');
+                    disp.innerText = "> C:\\GAMES\\HALO_CE (MOCK)";
+                    disp.classList.remove('hidden');
+                    setTimeout(() => transitionContent(() => renderStep('credits')), 1000);
+                }
+                return;
+            }
+
+            isProcessing = true;
+            const btnMain = document.getElementById('btn-main-action');
+            if(btnMain) btnMain.parentElement.style.display = 'none';
+            document.getElementById('processing-area').classList.remove('hidden');
+
+            if (window.pywebview) {
+                let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4 }[actionName] || 0;
+                window.pywebview.api.run_stage(stage);
+            } else {
+                simulateProgress();
+            }
+        }
+
+        function skipStep(currentKey) {
+            const idx = FLOW.indexOf(currentKey);
+            if(idx > -1 && idx < FLOW.length - 1) transitionContent(() => renderStep(FLOW[idx + 1]));
+        }
+
+        function updateConsole(text) {
+            const terminal = document.getElementById('terminal-logs');
+            if(!terminal) return;
+            const p = document.createElement('div');
+            p.innerText = `> ${text}`;
+            if(text.toLowerCase().includes('error')) p.style.color = 'var(--terminal-red)';
+            if(text.toLowerCase().includes('ok') || text.toLowerCase().includes('complete')) p.style.color = 'var(--terminal-green)';
+            terminal.prepend(p);
+        }
+
+        function updateProgress(percent) {
+            const fill = document.getElementById('progress-fill');
+            const text = document.getElementById('progress-text');
+            if(fill) fill.style.width = `${percent}%`;
+            if(text) text.innerText = `${Math.round(percent)}%`;
+        }
+
+        function phaseComplete(stageNum) {
+            isProcessing = false;
+            setTimeout(() => {
+                const idx = FLOW.indexOf(currentStepKey);
+                if(idx > -1 && idx < FLOW.length - 1) transitionContent(() => renderStep(FLOW[idx + 1]));
+            }, 1000);
+        }
+
+        function simulateProgress() {
+            let p = 0;
+            updateConsole("Simulating process...");
+            const int = setInterval(() => {
+                p+=5; updateProgress(p);
+                if(p >= 100) {
+                    clearInterval(int);
+                    updateConsole("Operation complete.");
+                    phaseComplete(1); 
+                }
+            }, 100);
+        }
+    </script>
+</body>
+</html>

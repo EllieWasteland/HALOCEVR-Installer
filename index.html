@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halo CE VR | Installer</title>
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;600&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Hoja de Estilos Propia -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Video -->
+    <div id="video-bg-container" class="opacity-0">
+        <video autoplay muted loop id="bg-video">
+            <source src="video.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <!-- FX -->
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Lang -->
+    <div id="language-screen" class="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="text-white/40 font-tech text-xs tracking-[0.5em] mb-8 animate-pulse">UNSC // SYSTEM CONFIG</div>
+        
+        <div class="flex flex-col md:flex-row gap-8 items-center">
+            <button onclick="selectLanguage('es')" class="lang-btn group">
+                <div class="w-full h-full border border-white/20 bg-white/5 flex flex-col items-center justify-center p-8 transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/50">
+                    <span class="text-4xl font-light font-tech text-white mb-2 group-hover:scale-110 transition-transform block">ES</span>
+                    <span class="text-xs tracking-[0.3em] text-white/50 group-hover:text-white">ESPAÑOL</span>
+                </div>
+            </button>
+            <button onclick="selectLanguage('en')" class="lang-btn group">
+                <div class="w-full h-full border border-white/20 bg-white/5 flex flex-col items-center justify-center p-8 transition-all duration-300 group-hover:bg-white/10 group-hover:border-white/50">
+                    <span class="text-4xl font-light font-tech text-white mb-2 group-hover:scale-110 transition-transform block">EN</span>
+                    <span class="text-xs tracking-[0.3em] text-white/50 group-hover:text-white">ENGLISH</span>
+                </div>
+            </button>
+        </div>
+
+        <div class="mt-12 text-white/20 text-[10px] font-tech tracking-widest">SELECT LANGUAGE TO INITIALIZE NEURAL LINK</div>
+    </div>
+
+    <!-- Boot -->
+    <div id="boot-screen" class="hidden opacity-0">
+        <div id="boot-logs" class="w-full max-w-lg flex flex-col gap-1 items-start font-tech text-xs md:text-sm text-zinc-400"></div>
+        <div class="mt-12 text-white font-tech text-xs tracking-[0.3em] animate-pulse" id="boot-loading-text"></div>
+    </div>
+
+    <!-- Intro -->
+    <div id="intro-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div id="intro-visual" class="relative flex items-center justify-center">
+            <div id="intro-btn-circle" class="w-24 h-24 rounded-full bg-black border border-white/30 backdrop-blur-md flex items-center justify-center relative z-20 transition-colors duration-500">
+                <i id="intro-icon" class="ph ph-fingerprint text-3xl text-white/50 transition-colors"></i>
+            </div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/20 animate-ping-slow z-10 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/10 animate-ping-slower z-0 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full bg-white/5 animate-pulse z-0 pointer-events-none"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/15 animate-ping-slow z-0 pointer-events-none" style="animation-delay: 0.5s"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/5 animate-ping-slower z-0 pointer-events-none" style="animation-delay: 1.5s"></div>
+            <div class="ripple-ring absolute top-0 left-0 w-24 h-24 rounded-full border border-white/10 animate-ping-slow z-0 pointer-events-none" style="animation-delay: 0.8s"></div>
+        </div>
+    </div>
+
+    <!-- UI -->
+    <div class="main-layout opacity-0 pointer-events-none transition-opacity duration-1000" id="main-interface">
+        <div class="panel-content">
+            <div class="absolute top-8 left-8 md:left-24 flex items-center gap-4 opacity-50">
+                <i class="ph ph-list text-white text-xl"></i>
+                <div class="h-[1px] w-12 bg-white"></div>
+                <span class="text-white font-tech text-xs tracking-widest">SYSTEM INSTALLER</span>
+            </div>
+
+            <div id="progress-wrapper" class="flex flex-col gap-2 mb-8 opacity-0 transition-opacity duration-500 pl-4 border-l-2 border-white/20">
+                <div class="flex justify-between items-end max-w-[300px]">
+                    <span id="phase-label" class="text-[10px] font-tech tracking-[0.2em] text-white/70 uppercase anim-fade-up">INIT...</span>
+                </div>
+                <div class="progress-pill-container">
+                    <div class="progress-segment segment-1"><div id="prog-bar-1" class="progress-fill"></div></div>
+                    <div class="progress-segment segment-2"><div id="prog-bar-2" class="progress-fill"></div></div>
+                </div>
+            </div>
+
+            <div id="content-container" class="content-wrapper flex flex-col justify-center"></div>
+
+            <div id="nav-controls" class="flex items-center gap-6 mt-10 opacity-0 pointer-events-none transition-opacity duration-500">
+                <button id="btn-back" onclick="changeStep(-1)" class="btn-back group">
+                    <span id="btn-back-text" class="group-hover:-translate-x-1 transition-transform inline-block">ATRÁS</span>
+                </button>
+                <button id="btn-next" onclick="changeStep(1)" class="btn-action">
+                    <span id="btn-next-text">SIGUIENTE</span> 
+                    <div class="btn-shine"></div>
+                </button>
+            </div>
+
+            <div id="footer-text" class="absolute bottom-8 left-8 md:left-24 font-tech text-[10px] text-white/30 animate-pulse hidden md:block tracking-[0.2em]"></div>
+        </div>
+
+        <div class="panel-visual">
+            <div class="relative flex items-center justify-center w-full h-full">
+                <div class="absolute w-[600px] h-[600px] border border-white/5 rounded-full"></div>
+                <div class="absolute w-[400px] h-[400px] border border-white/10 rounded-full rotate-45 border-dashed"></div>
+                <div id="visual-icon-container" class="relative z-10 transition-all duration-500 blur-glow"></div>
+            </div>
+            
+            <div class="absolute top-12 right-12 text-right">
+                <div class="text-white/40 font-tech text-xs tracking-widest mb-1">UNSC // SYSTEM</div>
+                <div class="flex gap-1 justify-end h-1">
+                    <div class="w-8 bg-white/40"></div>
+                    <div class="w-2 bg-white/20"></div>
+                    <div class="w-2 bg-white/10"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica Principal -->
+    <script src="main.js"></script>
+</body>
+</html>

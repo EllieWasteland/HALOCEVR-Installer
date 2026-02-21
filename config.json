@@ -1,0 +1,254 @@
+{
+  "common_config": {
+    "colors": {
+      "orange": "#ffffff",
+      "blue": "#e5e5e5",
+      "green": "#ffffff",
+      "red": "#ff3333"
+    },
+    "links": {
+      "discord": "https://discord.gg/halocevr",
+      "steamvr": "https://store.steampowered.com/app/250820/SteamVR/",
+      "halo_iso": "https://archive.org/download/HaloCEPC/HALO.iso",
+      "mod_installer": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe"
+    }
+  },
+  "languages": {
+    "es": {
+      "boot_sequence": {
+        "logs": [
+          "> INICIALIZANDO INTERFAZ UNSC...",
+          "> CARGANDO MÓDULOS VISUALES...",
+          "> SINCRONIZANDO ENLACE NEURAL...",
+          "> PROTOCOLO SPARTAN: ACTIVO"
+        ],
+        "loading_text": "ESTABLECIENDO CONEXIÓN..."
+      },
+      "ui_labels": {
+        "phase_1": "FASE 1: INSTALACIÓN BASE",
+        "phase_2": "FASE 2: INYECCIÓN VR",
+        "details_header": "DETALLES DE MISIÓN",
+        "tactical_order_header": "ORDEN TÁCTICA",
+        "key_label": "CLAVE DE PRODUCTO",
+        "footer_text": "UNSC ARCHIVES // REF: HALO_CE_VR // INFINITE_UI_MOD",
+        "back_btn": "ATRÁS",
+        "skip_download_btn": "OMITIR / YA LO TENGO",
+        "intro_btn": "INICIAR ENLACE",
+        "next_btn_default": "SIGUIENTE",
+        "download_btn": "DESCARGAR",
+        "continue_btn": "CONTINUAR",
+        "finish_btn": "FINALIZAR"
+      },
+      "splash_screen": {
+        "title": "HALO CE: VR",
+        "subtitle": "",
+        "description": "Bienvenido, Spartan. Sistema de adaptación de realidad virtual listo. A continuación se listan las mejoras del módulo de combate:",
+        "btn_start": "COMENZAR INSTALACIÓN",
+        "features": [
+          "Vista Estéreo 6DoF Sincronizada (VR Real)",
+          "Controladores con Seguimiento (Tracked)",
+          "Apuntado de Arma 6DoF",
+          "Lanzamiento de Granadas 6DoF",
+          "Mira PiP Funcional (Snipers)",
+          "Modo de Apuntado a Dos Manos",
+          "Controles Reasignables (Opción Zurdos)",
+          "Melee por Movimiento (Golpe Real)",
+          "Linterna Interactiva (Toque en cabeza)",
+          "Agachado Físico (Motion Controlled)",
+          "Holsters de Hombro (Cambio de Arma)",
+          "Interfaz (UI) Flotante Desacoplada",
+          "Retícula de Apuntado Flotante",
+          "Vehículos Controlados por Joystick"
+        ]
+      },
+      "installation_steps": [
+        {
+          "title": "REQUISITO: STEAMVR",
+          "desc": "Entorno de simulación virtual requerido.",
+          "instruction": "Asegúrese de tener SteamVR instalado y calibrado con su visor antes de proceder.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://store.steampowered.com/app/250820/SteamVR/",
+          "icon": "ph-goggles",
+          "phase": 1
+        },
+        {
+          "title": "1. OBTENER HALO CE",
+          "desc": "Adquisición de archivos fuente.",
+          "instruction": "Descargue la imagen de disco (ISO) original. Si dispone del medio físico, inserte el disco ahora.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://archive.org/download/HaloCEPC/HALO.iso",
+          "icon": "ph-disc",
+          "phase": 1
+        },
+        {
+          "title": "2. INSTALAR",
+          "desc": "Despliegue de archivos en disco local.",
+          "instruction": "1. Monte la ISO.<br>2. Ejecute <strong>Setup.exe</strong>.<br>3. Ruta sugerida: <code class='text-white font-bold'>C:\\Games\\Halo</code>.",
+          "icon": "ph-hard-drives",
+          "phase": 1
+        },
+        {
+          "title": "3. AUTENTICACIÓN",
+          "desc": "Clave de licencia requerida.",
+          "isKey": true,
+          "key": "MHJYD-HCYX4-VC8TD-J32X8-7KD4B",
+          "instruction": "Introduzca la siguiente clave de producto cuando el instalador lo solicite.",
+          "icon": "ph-key",
+          "phase": 1
+        },
+        {
+          "title": "FASE 1: COMPLETADA",
+          "desc": "Archivos base listos.",
+          "instruction": "El núcleo del juego está instalado. Procediendo a la inyección de código VR y parches gráficos.",
+          "icon": "ph-check-circle",
+          "phase": 1
+        },
+        {
+          "title": "4. AUTOINSTALADOR VR",
+          "desc": "Herramienta de modificación.",
+          "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches SPV3 y Chimera necesarios.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe",
+          "icon": "ph-rocket-launch",
+          "phase": 2
+        },
+        {
+          "title": "5. EJECUCIÓN",
+          "desc": "Aplicando parches al sistema...",
+          "instruction": "Ejecute <strong>HaloVR_Installer.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 2.",
+          "icon": "ph-terminal-window",
+          "phase": 2
+        },
+        {
+          "title": "LISTO PARA EL COMBATE",
+          "desc": "Instalación finalizada con éxito.",
+          "instruction": "Inicie SteamVR primero, luego ejecute el acceso directo 'Halo CE VR'. Nos vemos en el anillo, Spartan.",
+          "icon": "ph-flag-checkered",
+          "isGameEnd": true,
+          "phase": 2
+        }
+      ]
+    },
+    "en": {
+      "boot_sequence": {
+        "logs": [
+          "> INITIALIZING UNSC INTERFACE...",
+          "> LOADING VISUAL MODULES...",
+          "> SYNCHRONIZING NEURAL LINK...",
+          "> SPARTAN PROTOCOL: ACTIVE"
+        ],
+        "loading_text": "ESTABLISHING CONNECTION..."
+      },
+      "ui_labels": {
+        "phase_1": "PHASE 1: BASE INSTALLATION",
+        "phase_2": "PHASE 2: VR INJECTION",
+        "details_header": "MISSION DETAILS",
+        "tactical_order_header": "TACTICAL ORDER",
+        "key_label": "PRODUCT KEY",
+        "footer_text": "UNSC ARCHIVES // REF: HALO_CE_VR // INFINITE_UI_MOD",
+        "back_btn": "BACK",
+        "skip_download_btn": "SKIP / I HAVE IT",
+        "intro_btn": "INITIATE LINK",
+        "next_btn_default": "NEXT",
+        "download_btn": "DOWNLOAD",
+        "continue_btn": "CONTINUE",
+        "finish_btn": "FINISH"
+      },
+      "splash_screen": {
+        "title": "HALO CE: VR",
+        "subtitle": "",
+        "description": "Welcome, Spartan. Virtual Reality adaptation system ready. Combat module enhancements listed below:",
+        "btn_start": "START INSTALLATION",
+        "features": [
+          "Synchronized 6DoF Stereo View (Real VR)",
+          "Tracked Motion Controllers",
+          "6DoF Weapon Aiming",
+          "6DoF Grenade Throwing",
+          "Functional PiP Scope (Snipers)",
+          "Two-Handed Aiming Mode",
+          "Remappable Controls (Left-handed option)",
+          "Motion-based Melee (Real Punch)",
+          "Interactive Flashlight (Tap head)",
+          "Physical Crouching (Motion Controlled)",
+          "Shoulder Holsters (Weapon Swap)",
+          "Decoupled Floating UI",
+          "Floating Aim Reticle",
+          "Joystick Controlled Vehicles"
+        ]
+      },
+      "installation_steps": [
+        {
+          "title": "REQUIREMENT: STEAMVR",
+          "desc": "Virtual simulation environment required.",
+          "instruction": "Ensure SteamVR is installed and calibrated with your headset before proceeding.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://store.steampowered.com/app/250820/SteamVR/",
+          "icon": "ph-goggles",
+          "phase": 1
+        },
+        {
+          "title": "1. GET HALO CE",
+          "desc": "Source file acquisition.",
+          "instruction": "Download the original disk image (ISO). If you have physical media, insert the disc now.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://archive.org/download/HaloCEPC/HALO.iso",
+          "icon": "ph-disc",
+          "phase": 1
+        },
+        {
+          "title": "2. INSTALL",
+          "desc": "Deploy files to local drive.",
+          "instruction": "1. Mount the ISO.<br>2. Run <strong>Setup.exe</strong>.<br>3. Suggested path: <code class='text-white font-bold'>C:\\Games\\Halo</code>.",
+          "icon": "ph-hard-drives",
+          "phase": 1
+        },
+        {
+          "title": "3. AUTHENTICATION",
+          "desc": "License key required.",
+          "isKey": true,
+          "key": "MHJYD-HCYX4-VC8TD-J32X8-7KD4B",
+          "instruction": "Enter the following product key when requested by the installer.",
+          "icon": "ph-key",
+          "phase": 1
+        },
+        {
+          "title": "PHASE 1: COMPLETE",
+          "desc": "Base files ready.",
+          "instruction": "Core game installed. Proceeding to VR code injection and graphical patches.",
+          "icon": "ph-check-circle",
+          "phase": 1
+        },
+        {
+          "title": "4. VR AUTO-INSTALLER",
+          "desc": "Modification tool.",
+          "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary SPV3 and Chimera patches.",
+          "isDownload": true,
+          "showSkip": true,
+          "url": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe",
+          "icon": "ph-rocket-launch",
+          "phase": 2
+        },
+        {
+          "title": "5. EXECUTION",
+          "desc": "Applying system patches...",
+          "instruction": "Run <strong>HaloVR_Installer.exe</strong> and point it to the folder where you installed the game in step 2.",
+          "icon": "ph-terminal-window",
+          "phase": 2
+        },
+        {
+          "title": "READY FOR COMBAT",
+          "desc": "Installation successfully completed.",
+          "instruction": "Launch Halo shortcut with ur vr headset connected. See you on the ring, Spartan.",
+          "icon": "ph-flag-checkered",
+          "isGameEnd": true,
+          "phase": 2
+        }
+      ]
+    }
+  }
+}
