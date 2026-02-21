@@ -10,7 +10,7 @@
       "discord": "https://discord.gg/halocevr",
       "steamvr": "https://store.steampowered.com/app/250820/SteamVR/",
       "halo_iso": "https://archive.org/download/HaloCEPC/HALO.iso",
-      "mod_installer": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe"
+      "mod_installer": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe"
     }
   },
   "languages": {
@@ -111,14 +111,14 @@
           "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches SPV3 y Chimera necesarios.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },
         {
           "title": "5. EJECUCIÓN",
           "desc": "Aplicando parches al sistema...",
-          "instruction": "Ejecute <strong>HaloVR_Installer.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 2.",
+          "instruction": "Ejecute <strong>HaloCEVR_Installer_v1.0.0.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 2.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
@@ -229,14 +229,14 @@
           "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary SPV3 and Chimera patches.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/LivingFray/HaloCEVR/releases/latest/download/HaloCEVR_Installer.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },
         {
           "title": "5. EXECUTION",
           "desc": "Applying system patches...",
-          "instruction": "Run <strong>HaloVR_Installer.exe</strong> and point it to the folder where you installed the game in step 2.",
+          "instruction": "Run <strong>HaloCEVR_Installer_v1.0.0.exe</strong> and point it to the folder where you installed the game in step 2.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
