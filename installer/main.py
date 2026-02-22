@@ -7,7 +7,6 @@ import zipfile
 import shutil
 import subprocess
 import webview
-import py7zr
 import webbrowser
 from tkinter import Tk, filedialog
 
@@ -23,13 +22,6 @@ LOCAL_LAA_EXE = "halo.exe"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.join(BASE_DIR, "temp_install_files")
 INTERFACE_PATH = os.path.join(BASE_DIR, "interface.html")
-
-def find_7zip():
-    """Busca la instalación de 7-Zip en el sistema."""
-    candidates = [r"C:\Program Files\7-Zip\7z.exe", r"C:\Program Files (x86)\7-Zip\7z.exe"]
-    for path in candidates:
-        if os.path.exists(path): return path
-    return None
 
 class Api:
     def __init__(self):
@@ -170,16 +162,18 @@ class Api:
             raise Exception(f"Download failed: {e}")
 
     def _extract_7z_robust(self, archive, dest):
-        self.log("Extracting archive (7z)...")
-        try:
-            with py7zr.SevenZipFile(archive, 'r') as z: z.extractall(path=dest)
-        except:
-            seven_zip = find_7zip()
-            if seven_zip:
-                subprocess.run([seven_zip, 'x', archive, f'-o{dest}', '-y'], 
+        self.log("Extracting archive (7z) using local 7z.exe...")
+        seven_zip_path = os.path.join(BASE_DIR, "7z.exe")
+        
+        if os.path.exists(seven_zip_path):
+            try:
+                # Se utiliza el 7z.exe local de forma silenciosa (sin ventana)
+                subprocess.run([seven_zip_path, 'x', archive, f'-o{dest}', '-y'], 
                                check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-            else:
-                raise Exception("7z Extraction failed. Please install 7-Zip.")
+            except Exception as e:
+                raise Exception(f"7z Extraction failed. Error: {str(e)}")
+        else:
+            raise Exception("No se encontró 7z.exe. Por favor, asegúrate de incluir 7z.exe en la misma carpeta que el instalador.")
 
     def _backup_file(self, filename):
         target = os.path.join(self.game_path, filename)
@@ -205,10 +199,11 @@ class Api:
         if os.path.exists(patch_path):
             self.log("Running Patch 1.0.10...")
             try:
-                cmd = ["powershell", "Start-Process", f'"{patch_path}"', "-Verb", "RunAs", "-Wait"]
-                subprocess.run(cmd, shell=True, check=True)
-            except:
-                self.log("Patch 1.0.10 cancelled or failed.")
+                # Se eliminó la llamada a PowerShell con "-Verb RunAs"
+                # Ahora ejecuta el parche con los permisos actuales del programa.
+                subprocess.run([patch_path], check=True)
+            except Exception as e:
+                self.log(f"Patch 1.0.10 cancelled or failed: {str(e)}")
         else:
             self.log("Info: Patch 1.0.10 not found (skipping).")
 
