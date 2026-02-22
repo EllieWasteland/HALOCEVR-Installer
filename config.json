@@ -111,7 +111,7 @@
           "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches SPV3 y Chimera necesarios.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HaloCEVR_Installer_v1.0.0.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },
@@ -229,7 +229,7 @@
           "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary files for the VR MOD.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v0.1.0-alpha/HaloCEVR_Installer_v1.0.0.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HaloCEVR_Installer_v1.0.0.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },
