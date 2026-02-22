@@ -45,11 +45,10 @@ Includes an optional custom launcher that lets you seamlessly switch between **V
 Installation has been designed to be as painless as possible.
 
 1. Head to the **[Releases](../../releases)** section on the right sidebar of this repository.
-2. Download the latest version of the installer (`.zip` or `.exe`).
-3. Extract if necessary and run the application.
+2. Download the latest version of the installer.
+3. Run the application.
 4. In the interface, select the **root folder** where your game is installed. A clean copy of **Halo Custom Edition** or **Halo PC** is required.
-5. *(Optional)* Select the option to install the Dual-Mode Launcher if you want to switch between VR and Flat screens.
-6. Click **Install** and let the automated system handle the rest.
+5. Click **Install** and let the automated system handle the rest.
 
 > **Note:** Once installation finishes, close the installer. If you installed the launcher, use it to select your mode. Otherwise, just put on your headset and launch the game as you normally would to play in VR!
 
@@ -60,7 +59,6 @@ Installation has been designed to be as painless as possible.
 The project is under active development. Planned additions for upcoming releases include:
 
 - **Integrated HD Texture Packs** — Preconfigured high-resolution texture bundles tuned to avoid VR performance impact.
-- **Controller Support Improvements** — Enhanced binding compatibility and button mapping for Quest, Valve Index, HTC Vive, and other headsets.
 - **Native Uninstaller** — A built-in option to cleanly revert all changes and restore the game to its original vanilla state.
 
 ---

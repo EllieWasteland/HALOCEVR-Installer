@@ -205,7 +205,11 @@ class Api:
         if os.path.exists(patch_path):
             self.log("Running Patch 1.0.10...")
             try:
-                subprocess.run([patch_path], check=True)
+                # CORRECCIÓN PARA ELLIE: 
+                # Usamos PowerShell con -Wait para pausar el script de Python hasta que termine, 
+                # pero quitamos "-Verb RunAs" porque el .exe compilado ya tendrá esos permisos globales.
+                cmd = ["powershell", "Start-Process", f'"{patch_path}"', "-Wait"]
+                subprocess.run(cmd, shell=True, check=True)
             except Exception as e:
                 self.log(f"Patch 1.0.10 cancelled or failed: {str(e)}")
         else:
