@@ -205,7 +205,6 @@
 
     <div id="main-interface" class="main-layout">
         
-        <!-- Botón de Cancelar / Cerrar App -->
         <button onclick="triggerPythonAction('close')" class="btn-cancel absolute top-8 right-8 z-50 backdrop-blur-md shadow-lg" title="Cancelar Instalación">
             <i class="ph ph-x text-lg"></i>
             <span id="btn-cancel-text">CANCELAR</span>
@@ -221,7 +220,7 @@
             <div id="content-container"></div>
 
             <div class="absolute bottom-8 left-8 md:left-24 font-tech text-[10px] text-white/30 tracking-[0.2em] flex gap-4">
-                <span id="sys-id">ID: UNSC-SYS // V1.4</span>
+                <span id="sys-id">ID: UNSC-SYS // V1.5</span>
                 <span id="sys-status">STATUS: ONLINE</span>
             </div>
         </div>
@@ -242,29 +241,31 @@
                 lang_title: "IDIOMA / LANGUAGE", lang_sub: "CONFIGURACIÓN INICIAL", lang_desc: "Seleccione el idioma preferido para la interfaz del instalador.",
                 splash_title: "HALO CE VR", splash_sub: "UTILIDAD DE INSTALACIÓN", splash_desc: "Este sistema automatizado configurará los componentes necesarios para la realidad virtual en Halo: Combat Evolved. Asegúrese de tener una copia limpia del juego.", btn_start: "INICIAR PROCESO",
                 folder_title: "UBICACIÓN", folder_sub: "DIRECTORIO RAÍZ", folder_desc: "Seleccione la carpeta donde está instalado 'Halo Custom Edition' o 'Halo PC' (asegúrese de haberlo instalado vía Steam o disco original). El sistema buscará 'halo.exe'.", btn_select: "SELECCIONAR RUTA",
-                credits_title: "CRÉDITOS", credits_sub: "COMUNIDAD MODDING", credits_desc: "Este instalador es posible gracias al trabajo increíble de desarrolladores independientes. Apoya a los creadores originales visitando sus repositorios.", btn_thanks: "GRACIAS Y CONTINUAR",
-                core_title: "NÚCLEO VR", core_sub: "FASE 1 DE 4", core_desc: "Instalación del motor de renderizado VR y actualización del ejecutable a la versión 1.0.10. Fundamental para la estereoscopía.", loading_core: "DESCARGANDO RECURSOS...",
-                chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 4", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
-                laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 4", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
-                audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 4", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
-                final_title: "COMPLETADO", final_sub: "SISTEMA LISTO", final_desc: "Todos los componentes han sido instalados correctamente. Se ha generado un archivo de registro .txt en la carpeta de tu juego. Puedes cerrar el instalador e iniciar el juego desde tu visor.", btn_close: "CERRAR INSTALADOR",
+                credits_title: "CRÉDITOS", credits_sub: "COMUNIDAD MODDING", credits_desc: "Este instalador es posible gracias al trabajo increíble de desarrolladores independientes. Se utiliza tecnología de 7-Zip para la descompresión. Apoya a los creadores originales visitando sus repositorios.", btn_thanks: "GRACIAS Y CONTINUAR",
+                core_title: "NÚCLEO VR", core_sub: "FASE 1 DE 5", core_desc: "Instalación del motor de renderizado VR y actualización del ejecutable a la versión 1.0.10. Fundamental para la estereoscopía.", loading_core: "DESCARGANDO RECURSOS...",
+                chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 5", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
+                laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 5", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
+                audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 5", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
+                shortcut_title: "ACCESO DIRECTO", shortcut_sub: "FASE 5 DE 5", shortcut_desc: "Generar un acceso directo 'Halo Launcher' en tu escritorio. Este te permitirá iniciar el juego y alternar fácilmente entre la versión original Flat y la versión VR.", loading_shortcut: "CREANDO LAUNCHER...",
+                final_title: "COMPLETADO", final_sub: "SISTEMA LISTO", final_desc: "Todos los componentes han sido instalados. Se ha generado un acceso directo en tu escritorio para iniciar tu juego. ¡Disfruta la experiencia, Spartan!", btn_close: "CERRAR INSTALADOR",
                 btn_install: "INSTALAR", btn_skip: "OMITIR", btn_cancel: "CANCELAR INSTALACIÓN", status_wait: "Esperando comando..."
             },
             en: {
                 lang_title: "LANGUAGE / IDIOMA", lang_sub: "INITIAL SETUP", lang_desc: "Select your preferred language for the installer interface.",
                 splash_title: "HALO CE VR", splash_sub: "INSTALLATION UTILITY", splash_desc: "This automated system will configure the necessary components for Virtual Reality in Halo: Combat Evolved. Ensure you have a clean copy of the game.", btn_start: "START PROCESS",
                 folder_title: "LOCATION", folder_sub: "ROOT DIRECTORY", folder_desc: "Select the folder where 'Halo Custom Edition' or 'Halo PC' is installed (ensure it's installed via Steam or original disc). The system will look for 'halo.exe'.", btn_select: "SELECT PATH",
-                credits_title: "CREDITS", credits_sub: "MODDING COMMUNITY", credits_desc: "This installer is made possible by the incredible work of independent developers. Please support the original creators by checking out their repositories.", btn_thanks: "THANKS & CONTINUE",
-                core_title: "VR CORE", core_sub: "PHASE 1 OF 4", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
-                chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 4", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
-                laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 4", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
-                audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 4", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
-                final_title: "COMPLETE", final_sub: "SYSTEM READY", final_desc: "All components have been successfully installed. A .txt log file has been generated in your game folder. You may close the installer and launch the game from your headset.", btn_close: "CLOSE INSTALLER",
+                credits_title: "CREDITS", credits_sub: "MODDING COMMUNITY", credits_desc: "This installer is made possible by the incredible work of independent developers. We utilize 7-Zip technology for file decompression. Please support the original creators by checking out their repositories.", btn_thanks: "THANKS & CONTINUE",
+                core_title: "VR CORE", core_sub: "PHASE 1 OF 5", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
+                chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 5", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
+                laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 5", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
+                audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 5", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
+                shortcut_title: "SHORTCUT", shortcut_sub: "PHASE 5 OF 5", shortcut_desc: "Generate a 'Halo Launcher' shortcut on your desktop. This will allow you to easily launch the game and toggle between the original Flat version and the VR version.", loading_shortcut: "CREATING LAUNCHER...",
+                final_title: "COMPLETE", final_sub: "SYSTEM READY", final_desc: "All components successfully installed. A shortcut has been generated on your desktop to launch your game. Enjoy the experience, Spartan!", btn_close: "CLOSE INSTALLER",
                 btn_install: "INSTALL", btn_skip: "SKIP", btn_cancel: "CANCEL INSTALLATION", status_wait: "Waiting for command..."
             }
         };
 
-        const FLOW = ['splash', 'folder', 'credits', 'core', 'chimera', 'laa', 'audio', 'final'];
+        const FLOW = ['splash', 'folder', 'credits', 'core', 'chimera', 'laa', 'audio', 'shortcut', 'final'];
         let currentLang = 'en';
         let currentStepKey = 'language';
         let isProcessing = false;
@@ -403,7 +404,6 @@
                 return;
             }
 
-            // Si llegamos al final, invocamos la generación del archivo txt
             if (key === 'final' && window.pywebview) {
                 window.pywebview.api.generate_log(currentLang);
             }
@@ -412,11 +412,12 @@
             const meta = {
                 splash: { icon: "ph-fingerprint", action: null },
                 folder: { icon: "ph-folder-notch-open", action: "selectFolder" },
-                credits: { icon: "ph-users", action: null }, // Nueva meta
+                credits: { icon: "ph-users", action: null },
                 core: { icon: "ph-cube", action: "installCore" },
                 chimera: { icon: "ph-aperture", action: "installChimera", skip: true },
                 laa: { icon: "ph-memory", action: "installLAA", skip: true },
                 audio: { icon: "ph-speaker-high", action: "installAudio", skip: true },
+                shortcut: { icon: "ph-desktop", action: "installShortcut", skip: true },
                 final: { icon: "ph-check-circle", action: "finish" }
             };
 
@@ -437,7 +438,6 @@
                 </div>
             `;
 
-            // Pantalla de créditos única
             if (key === 'credits') {
                 html += `
                     <div class="grid grid-cols-2 gap-3 w-full max-w-lg mb-8 anim-slide-in delay-2">
@@ -469,6 +469,13 @@
                             </div>
                             <div class="text-white/50 text-xs">by ThreeDeeJay</div>
                         </div>
+                        <div onclick="openUrl('https://www.7-zip.org/')" class="col-span-2 p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-white font-tech text-lg">7-Zip Technology</span>
+                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
+                            </div>
+                            <div class="text-white/50 text-xs">File decompression engine by Igor Pavlov</div>
+                        </div>
                     </div>
                     <div class="flex gap-4 anim-slide-in delay-3">
                         <button onclick="transitionContent(() => renderStep('core'))" class="btn-action w-full justify-center">${text.btn_thanks}</button>
@@ -478,7 +485,6 @@
                 return;
             }
 
-            // Flujo estándar para las demás pantallas
             html += `<div class="mt-8 flex gap-4 anim-slide-in delay-2">`;
             
             if (key === 'splash') {
@@ -523,7 +529,6 @@
                             disp.innerText = "> " + path;
                             disp.classList.remove('hidden');
                             disp.classList.add('text-green-400');
-                            // Redirigir hacia créditos en lugar de 'core' directamente
                             setTimeout(() => transitionContent(() => renderStep('credits')), 1000);
                         }
                     });
@@ -542,7 +547,7 @@
             document.getElementById('processing-area').classList.remove('hidden');
 
             if (window.pywebview) {
-                let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4 }[actionName] || 0;
+                let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4, installShortcut: 5 }[actionName] || 0;
                 window.pywebview.api.run_stage(stage);
             } else {
                 simulateProgress();
@@ -560,7 +565,7 @@
             const p = document.createElement('div');
             p.innerText = `> ${text}`;
             if(text.toLowerCase().includes('error')) p.style.color = 'var(--terminal-red)';
-            if(text.toLowerCase().includes('ok') || text.toLowerCase().includes('complete')) p.style.color = 'var(--terminal-green)';
+            if(text.toLowerCase().includes('ok') || text.toLowerCase().includes('complete') || text.toLowerCase().includes('correctamente')) p.style.color = 'var(--terminal-green)';
             terminal.prepend(p);
         }
 

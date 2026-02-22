@@ -18,6 +18,7 @@ URL_DSOAL = "https://github.com/ThreeDeeJay/dsoal/releases/download/0.9.6/DSOAL+
 # Nombres de archivos locales esperados
 PATCH_EXE_NAME = "halopc-patch-1.0.10.exe"
 LOCAL_LAA_EXE = "halo.exe" 
+LAUNCHER_EXE_NAME = "HaloLauncher.exe" # Nombre del launcher compilado a copiar
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.join(BASE_DIR, "temp_install_files")
@@ -48,14 +49,14 @@ class Api:
 
     def quit_app(self):
         """Cierra la aplicación completamente destruyendo la ventana y el proceso."""
-        print("Cerrando instalador...")
+        self.log("Cerrando instalador...")
         if 'window' in globals() and window:
             window.destroy()
         # Matamos el proceso para asegurar que los hilos no queden colgados
         os._exit(0)
 
     def open_url(self, url):
-        """Abre enlaces en el navegador predeterminado del sistema (usado en la pantalla de créditos)."""
+        """Abre enlaces en el navegador predeterminado del sistema."""
         webbrowser.open(url)
 
     def generate_log(self, lang):
@@ -77,7 +78,9 @@ class Api:
                         f.write("- Parche LAA: Ejecutable halo.exe actualizado para aprovechar 4GB de RAM.\n")
                     if 'audio' in self.installed_mods:
                         f.write("- Audio 3D (DSOAL): Bibliotecas HRTF espaciales configuradas con alsoft.ini.\n")
-                    f.write("\n¡El proceso ha finalizado correctamente! Ya puedes ejecutar el juego en modo VR.\n")
+                    if 'shortcut' in self.installed_mods:
+                        f.write("- Launcher Integrado: Se ha copiado 'Halo Launcher.exe' y creado un acceso directo en el escritorio.\n")
+                    f.write("\n¡El proceso ha finalizado correctamente! Ya puedes ejecutar el juego.\n")
                 else:
                     f.write("=== HALO CE VR INSTALLATION LOG ===\n")
                     f.write("===================================\n\n")
@@ -90,7 +93,9 @@ class Api:
                         f.write("- LAA Patch: halo.exe updated to access 4GB of RAM.\n")
                     if 'audio' in self.installed_mods:
                         f.write("- 3D Audio (DSOAL): HRTF spatial libraries configured alongside alsoft.ini.\n")
-                    f.write("\nProcess completed successfully! You can now launch the game in VR mode.\n")
+                    if 'shortcut' in self.installed_mods:
+                        f.write("- Custom Launcher: 'Halo Launcher.exe' copied and desktop shortcut generated.\n")
+                    f.write("\nProcess completed successfully! You can now launch the game.\n")
             self.log(f"Install log generated successfully at: {log_path}")
         except Exception as e:
             self.log(f"Error generating install log: {str(e)}")
@@ -123,6 +128,8 @@ class Api:
                 self._stage_3_laa()
             elif stage_num == 4:
                 self._stage_4_audio()
+            elif stage_num == 5:
+                self._stage_5_shortcut() # Nueva Fase: Launcher
             
             elapsed = time.time() - start_time
             if elapsed < 1.0: time.sleep(1.0 - elapsed)
@@ -194,20 +201,16 @@ class Api:
     def _stage_1_core_vr(self):
         self.log("--- MODULE 1: CORE VR ---")
         
-        # 1. Parche Oficial
         patch_path = os.path.join(BASE_DIR, PATCH_EXE_NAME)
         if os.path.exists(patch_path):
             self.log("Running Patch 1.0.10...")
             try:
-                # Se eliminó la llamada a PowerShell con "-Verb RunAs"
-                # Ahora ejecuta el parche con los permisos actuales del programa.
                 subprocess.run([patch_path], check=True)
             except Exception as e:
                 self.log(f"Patch 1.0.10 cancelled or failed: {str(e)}")
         else:
             self.log("Info: Patch 1.0.10 not found (skipping).")
 
-        # 2. Archivos VR
         vr_zip = os.path.join(TEMP_DIR, "HaloCEVR.zip")
         if not os.path.exists(vr_zip): self._download_file(URL_HALO_VR, vr_zip)
         
@@ -329,6 +332,57 @@ class Api:
         with open(os.path.join(self.game_path, "alsoft.ini"), "w") as f:
             f.write(alsoft_content)
         self.installed_mods.append('audio')
+
+    def _stage_5_shortcut(self):
+        """Copia el Launcher compilado (Halo Launcher.exe) y crea un acceso directo en el escritorio."""
+        self.log("--- MODULE 5: LAUNCHER & SHORTCUT ---")
+        
+        launcher_src = os.path.join(BASE_DIR, LAUNCHER_EXE_NAME)
+        launcher_dst = os.path.join(self.game_path, LAUNCHER_EXE_NAME)
+        
+        # 1. Copiar el launcher a la carpeta del juego
+        if os.path.exists(launcher_src):
+            self.log(f"Copiando {LAUNCHER_EXE_NAME} al directorio del juego...")
+            try:
+                shutil.copy2(launcher_src, launcher_dst)
+            except Exception as e:
+                self.log(f"Error copiando launcher: {str(e)}")
+        else:
+            self.log(f"ADVERTENCIA: No se encontró '{LAUNCHER_EXE_NAME}' junto al instalador. Revisa que lo hayas compilado.")
+            launcher_dst = None
+            
+        if not launcher_dst:
+            self.log("Saltando creación de acceso directo: Archivo origen no encontrado.")
+            return
+
+        # 2. Crear el script .vbs para generar el .lnk apuntando directo al EXE del launcher
+        self.log("Generando acceso directo en el Escritorio...")
+        try:
+            desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
+            shortcut_path = os.path.join(desktop, 'Halo CE Launcher.lnk')
+            # Usamos el ícono del juego para el acceso directo
+            icon_path = os.path.join(self.game_path, "halo.exe")
+            
+            vbs_script = f"""
+Set ws = CreateObject("WScript.Shell")
+Set link = ws.CreateShortcut("{shortcut_path}")
+link.TargetPath = "{launcher_dst}"
+link.WorkingDirectory = "{self.game_path}"
+link.IconLocation = "{icon_path}, 0"
+link.Save
+"""
+            vbs_path = os.path.join(TEMP_DIR, "create_shortcut.vbs")
+            with open(vbs_path, "w", encoding="utf-8") as f:
+                f.write(vbs_script)
+
+            # Ejecutar el VBS silenciosamente
+            subprocess.run(["cscript.exe", "//Nologo", vbs_path], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            
+            self.installed_mods.append('shortcut')
+            self.log("Acceso directo creado correctamente.")
+        except Exception as e:
+            self.log(f"Error al crear el acceso directo: {str(e)}")
+
 
 if __name__ == '__main__':
     if not os.path.exists(INTERFACE_PATH):
