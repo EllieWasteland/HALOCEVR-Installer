@@ -17,7 +17,7 @@
 
 ## Overview
 
-This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, and spatial audio — in a single automated pass. No more hunting across multiple repositories or following error-prone manual guides.
+This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, and spatial audio — in a single automated pass. No more hunting across multiple repositories or following error-prone manual guides. 
 
 ---
 
@@ -35,8 +35,8 @@ The UI draws from UNSC terminal aesthetics to keep the experience on-theme, clea
 | **LAA Patch** | Enables the game to address up to 4 GB of RAM, preventing crashes |
 | **DSOAL (3D Audio)** | HRTF implementation for accurate spatial audio inside VR headsets |
 
-### Detailed Logging
-An installation report is automatically generated and saved directly to your game folder upon completion.
+### Dual-Mode Launcher (New!)
+Includes an optional custom launcher that lets you seamlessly switch between **VR Mode** and standard **Flat Mode**. If you choose not to install the launcher add-on, the game will automatically default to VR mode.
 
 ---
 
@@ -48,9 +48,10 @@ Installation has been designed to be as painless as possible.
 2. Download the latest version of the installer (`.zip` or `.exe`).
 3. Extract if necessary and run the application.
 4. In the interface, select the **root folder** where your game is installed. A clean copy of **Halo Custom Edition** or **Halo PC** is required.
-5. Click **Install** and let the automated system handle the rest.
+5. *(Optional)* Select the option to install the Dual-Mode Launcher if you want to switch between VR and Flat screens.
+6. Click **Install** and let the automated system handle the rest.
 
-> **Note:** Once installation finishes, close the installer, put on your headset, and launch the game as you normally would.
+> **Note:** Once installation finishes, close the installer. If you installed the launcher, use it to select your mode. Otherwise, just put on your headset and launch the game as you normally would to play in VR!
 
 ---
 
