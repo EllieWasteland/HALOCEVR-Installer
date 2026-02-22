@@ -17,8 +17,7 @@
 
 ## Overview
 
-This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, and spatial audio — in a single automated pass. No more hunting across multiple repositories or following error-prone manual guides. 
-
+This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, and spatial audio — in a single automated pass.
 ---
 
 ## Features
