@@ -24,9 +24,12 @@ class LauncherApi:
                 if os.path.exists(D3D9_DLL):
                     os.remove(D3D9_DLL)
                 os.rename(D3D9_BAK, D3D9_DLL)
-        except Exception:
-            pass
-        self.run_game()
+            self.run_game()
+        except PermissionError:
+            webview.windows[0].evaluate_js('showError("Permission Error: Run as Administrator or move the game out of Program Files.")')
+        except Exception as e:
+            escaped_error = str(e).replace('"', '\\"')
+            webview.windows[0].evaluate_js(f'showError("Error: {escaped_error}")')
 
     def set_original_mode(self):
         try:
@@ -34,15 +37,20 @@ class LauncherApi:
                 if os.path.exists(D3D9_BAK):
                     os.remove(D3D9_BAK)
                 os.rename(D3D9_DLL, D3D9_BAK)
-        except Exception:
-            pass
-        self.run_game()
+            self.run_game()
+        except PermissionError:
+            webview.windows[0].evaluate_js('showError("Permission Error: Run as Administrator or move the game out of Program Files.")')
+        except Exception as e:
+            escaped_error = str(e).replace('"', '\\"')
+            webview.windows[0].evaluate_js(f'showError("Error: {escaped_error}")')
 
     def run_game(self):
         if not os.path.exists(EXE_PATH):
             escaped_path = EXE_PATH.replace("\\", "\\\\")
             webview.windows[0].evaluate_js(f'showError("halo.exe not found at: {escaped_path}")')
             return
+        
+        # Run the game and close the launcher
         subprocess.Popen([EXE_PATH], cwd=GAME_DIR)
         self.cancel()
 
@@ -228,6 +236,11 @@ HTML_CONTENT = """
             const box = document.getElementById('error-box');
             box.innerText = msg;
             box.style.display = 'block';
+            
+            // Hide the error after 5 seconds
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 5000);
         }
     </script>
 </body>
