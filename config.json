@@ -10,7 +10,7 @@
       "discord": "https://discord.gg/halocevr",
       "steamvr": "https://store.steampowered.com/app/250820/SteamVR/",
       "halo_iso": "https://archive.org/download/HaloCEPC/HALO.iso",
-      "mod_installer": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HaloCEVR_Installer_v1.0.0.exe"
+      "mod_installer": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HALOCEVR_Installer.exe"
     }
   },
   "languages": {
@@ -117,7 +117,7 @@
           "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches SPV3 y Chimera necesarios.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HaloCEVR_Installer_v1.0.0.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HALOCEVR_Installer.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },
@@ -241,7 +241,7 @@
           "instruction": "Download the <strong>Halo VR Installer</strong>. This executable contains the necessary files for the VR MOD.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HaloCEVR_Installer_v1.0.0.exe",
+          "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HALOCEVR_Installer.exe",
           "icon": "ph-rocket-launch",
           "phase": 2
         },

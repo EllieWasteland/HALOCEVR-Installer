@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import webview
 import webbrowser
+import win32com.client  # Importado para la creación del acceso directo
 from tkinter import Tk, filedialog
 
 # --- CONFIGURACIÓN DE RECURSOS ---
@@ -22,7 +23,7 @@ LAUNCHER_EXE_NAME = "HaloLauncher.exe" # Nombre del launcher compilado a copiar
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.join(BASE_DIR, "temp_install_files")
-INTERFACE_PATH = os.path.join(BASE_DIR, "interface.html")
+INTERFACE_PATH = os.path.join(BASE_DIR, "HALOCEVR_Installer.html")
 
 class Api:
     def __init__(self):
@@ -359,7 +360,7 @@ class Api:
             self.log("Saltando creación de acceso directo: Archivo origen no encontrado.")
             return
 
-        # 2. Crear el script .vbs para generar el .lnk apuntando directo al EXE del launcher
+        # 2. Crear el acceso directo usando win32com.client
         self.log("Generando acceso directo en el Escritorio...")
         try:
             desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
@@ -367,20 +368,19 @@ class Api:
             # Usamos el ícono del juego para el acceso directo
             icon_path = os.path.join(self.game_path, "halo.exe")
             
-            vbs_script = f"""
-Set ws = CreateObject("WScript.Shell")
-Set link = ws.CreateShortcut("{shortcut_path}")
-link.TargetPath = "{launcher_dst}"
-link.WorkingDirectory = "{self.game_path}"
-link.IconLocation = "{icon_path}, 0"
-link.Save
-"""
-            vbs_path = os.path.join(TEMP_DIR, "create_shortcut.vbs")
-            with open(vbs_path, "w", encoding="utf-8") as f:
-                f.write(vbs_script)
-
-            # Ejecutar el VBS silenciosamente
-            subprocess.run(["cscript.exe", "//Nologo", vbs_path], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            # Inicializar el objeto de Windows Script Host
+            shell = win32com.client.Dispatch("WScript.Shell")
+            
+            # Crear el objeto del acceso directo
+            acceso_directo = shell.CreateShortCut(shortcut_path)
+            
+            # Configurar las propiedades principales
+            acceso_directo.TargetPath = launcher_dst
+            acceso_directo.WorkingDirectory = self.game_path
+            acceso_directo.IconLocation = f"{icon_path}, 0"
+            
+            # Guardar el archivo .lnk en el disco
+            acceso_directo.Save()
             
             self.installed_mods.append('shortcut')
             self.log("Acceso directo creado correctamente.")
