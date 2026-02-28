@@ -8,8 +8,7 @@
         // Init
         async function loadDataAndInit() {
             try {
-                // He añadido un mock de respaldo para que la app funcione aquí en Canvas sin el archivo config.json subido. 
-                // En tu entorno local, cargará exitosamente tu config.json real.
+                // He actualizado el mock también para que funcione el preview en Canvas con tus nuevos pasos
                 const mockConfig = {
                     "common_config": {
                         "boot_sequence": {
@@ -23,7 +22,11 @@
                                 "footer_text": "UNSC SECURE CHANNEL", "phase_1": "FASE 1 - PREPARACIÓN", "phase_2": "FASE 2 - INSTALACIÓN",
                                 "tactical_order_header": "ORDEN TÁCTICA", "key_label": "CLAVE DE ACTIVACIÓN",
                                 "skip_download_btn": "SALTAR DESCARGA", "download_btn": "DESCARGAR MOD", "continue_btn": "CONTINUAR",
-                                "finish_btn": "FINALIZAR", "next_btn_default": "SIGUIENTE", "back_btn": "ATRÁS"
+                                "finish_btn": "FINALIZAR", "next_btn_default": "SIGUIENTE", "back_btn": "ATRÁS",
+                                "already_installed_btn": "YA ACABÉ DE INSTALAR",
+                                "popup_confirm_title": "VERIFICACIÓN DE RUTA",
+                                "popup_confirm_desc": "¿Confirmas que instalaste el juego en otra carpeta (ej. C:\\Games\\Halo) y NO en Program Files?",
+                                "popup_confirm_btn": "SÍ, CONFIRMO", "popup_cancel_btn": "NO, REVISAR"
                             },
                             "splash_screen": {
                                 "subtitle": "PROYECTO SPARTAN", "title": "HALO CE VR", "description": "Protocolo de instalación automatizado para inmersión neuronal en entorno de combate.",
@@ -31,14 +34,14 @@
                             },
                             "installation_steps": [
                                 {
-                                    "phase": 1, "title": "DESCARGA", "desc": "Descarga los archivos base necesarios desde el servidor seguro.", "icon": "ph-download-simple",
-                                    "instruction": "Haz clic en 'DESCARGAR MOD' para obtener el archivo .zip con los binarios de VR.",
-                                    "isDownload": true, "url": "https://github.com"
+                                    "phase": 1, "title": "AUTENTICACIÓN", "desc": "Validación de software para la instalación base.", "icon": "ph-fingerprint",
+                                    "instruction": "Necesitarás esta licencia para instalar Halo: CE. Cópiala haciendo clic en ella antes de continuar.",
+                                    "isKey": true, "key": "HVR0-CE24-UNSC-7777"
                                 },
                                 {
-                                    "phase": 2, "title": "AUTENTICACIÓN", "desc": "Se requiere validación de software para continuar la extracción.", "icon": "ph-fingerprint",
-                                    "instruction": "Copia cada segmento de la clave pulsando sobre ellos e introdúcelos en el instalador.",
-                                    "isKey": true, "key": "HVR0-CE24-UNSC-7777"
+                                    "phase": 1, "title": "INSTALACIÓN", "desc": "Despliegue de archivos en disco local.", "icon": "ph-hard-drives",
+                                    "instruction": "Instala el juego en cualquier carpeta MENOS en Program Files (ejemplo: C:/Game/Halo)",
+                                    "isInstallStep": true
                                 },
                                 {
                                     "phase": 2, "title": "COMPLETADO", "desc": "Protocolos finalizados correctamente. Estás listo para el despliegue.", "icon": "ph-check-circle",
@@ -61,7 +64,6 @@
         // Lang
         function selectLanguage(lang) {
             if (!fullData) return;
-            // Si el idioma no está en el mock, caemos por defecto en ES
             const selectedLang = fullData.languages[lang] ? lang : 'es';
             appData = { ...fullData.common_config, ...fullData.languages[selectedLang] };
             
@@ -173,10 +175,8 @@
             visual.style.transform = 'scale(1)';
         }
 
-        // Utils - MEJORA EN EL MÉTODO DE COPIADO AL PORTAPAPELES
+        // Utils - Copiado al Portapapeles
         function copyKeySegment(text, btnElement) {
-            // Creamos un textarea invisible para ejecutar el comando de copiado
-            // de forma que sea 100% compatible con todos los navegadores e iframes.
             const textArea = document.createElement("textarea");
             textArea.value = text;
             textArea.style.position = "fixed";
@@ -188,16 +188,55 @@
 
             try {
                 document.execCommand('copy');
-                // Añadimos el estado de copiado visual (Muestra el botón verde de Check)
                 btnElement.classList.add('copied-state');
-                
-                // Lo removemos luego de un breve lapso de tiempo
                 setTimeout(() => btnElement.classList.remove('copied-state'), 1500);
             } catch (err) {
                 console.error('No se pudo copiar el texto', err);
             }
 
             document.body.removeChild(textArea);
+        }
+
+        // Modal de Confirmación
+        function showInstallConfirmPopup() {
+            const modal = document.getElementById('install-modal');
+            const content = document.getElementById('install-modal-content');
+            
+            document.getElementById('modal-title').innerText = appData.ui_labels.popup_confirm_title;
+            document.getElementById('modal-desc').innerText = appData.ui_labels.popup_confirm_desc;
+            document.getElementById('modal-cancel').querySelector('span').innerText = appData.ui_labels.popup_cancel_btn;
+            document.getElementById('modal-confirm-text').innerText = appData.ui_labels.popup_confirm_btn;
+
+            modal.classList.remove('hidden');
+            modal.style.pointerEvents = 'all';
+            
+            // Timeout ligero para que la animación CSS actúe tras quitar el display:none
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function cancelInstallPath() {
+            const modal = document.getElementById('install-modal');
+            const content = document.getElementById('install-modal-content');
+            
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            modal.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function confirmInstallPath() {
+            cancelInstallPath();
+            changeStep(1);
         }
 
         // Screens
@@ -309,12 +348,10 @@
                         </div>`;
             }
 
-            // --- MEJORA EN EL RENDERIZADO DE LAS KEYS ---
             if (step.isKey) {
                 const keyParts = step.key.split('-');
                 let keyHtml = '<div class="flex flex-wrap gap-2 md:gap-3 justify-center items-center mt-4">';
                 
-                // Actualizamos la estructura de la key para admitir el Hover y Copied Effect visual.
                 keyParts.forEach((part, idx) => {
                     keyHtml += `
                         <button onclick="copyKeySegment('${part}', this)" class="key-segment group">
@@ -336,7 +373,6 @@
                             </div>
                         </div>`;
             }
-            // --- FIN MEJORA EN RENDERIZADO KEYS ---
 
             contentDiv.innerHTML = html;
             visualIconContainer.innerHTML = `<i class="ph ${step.icon} visual-icon" style="color: white;"></i>`;
@@ -352,6 +388,7 @@
                 navControls.insertBefore(skipBtn, btnNext);
             }
 
+            // Aquí inyectamos la lógica del botón y el modal en base al paso
             if (step.isDownload) {
                 btnNextText.innerText = appData.ui_labels.download_btn;
                 btnNext.onclick = () => {
@@ -364,6 +401,9 @@
             } else if (step.isGameEnd) {
                 btnNextText.innerText = appData.ui_labels.finish_btn;
                 btnNext.onclick = () => window.close();
+            } else if (step.isInstallStep) {
+                btnNextText.innerText = appData.ui_labels.already_installed_btn;
+                btnNext.onclick = () => showInstallConfirmPopup();
             } else {
                 btnNextText.innerText = appData.ui_labels.next_btn_default;
                 btnNext.onclick = () => changeStep(1);

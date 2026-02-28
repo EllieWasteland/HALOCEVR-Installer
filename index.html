@@ -125,6 +125,28 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación de Instalación -->
+    <div id="install-modal" class="hidden fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="glass-card max-w-md w-full mx-4 border border-red-500/30 bg-red-950/20 transform scale-95 transition-transform duration-300 shadow-[0_0_50px_rgba(220,38,38,0.2)]" id="install-modal-content">
+            <div class="flex items-center gap-3 mb-4">
+                <i class="ph ph-warning-circle text-red-500 text-3xl"></i>
+                <h3 class="text-white font-tech text-xl tracking-widest uppercase" id="modal-title">VERIFICACIÓN DE RUTA</h3>
+            </div>
+            <div class="dotted-line border-red-500/30"></div>
+            <p class="text-white/80 font-light mt-4 mb-8 whitespace-pre-line" id="modal-desc">
+                ¿Confirmas que instalaste el juego fuera de Program Files?
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-end items-center mt-4">
+                <button class="btn-ghost text-red-300 border-red-500/30 hover:bg-red-500/10 w-full md:w-auto" onclick="cancelInstallPath()" id="modal-cancel">
+                    <span>REVISAR</span>
+                </button>
+                <button class="btn-warning w-full md:w-auto justify-center" onclick="confirmInstallPath()">
+                    <span id="modal-confirm-text">CONFIRMO</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Lógica Principal -->
     <script src="main.js"></script>
 </body>

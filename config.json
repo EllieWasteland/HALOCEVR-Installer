@@ -37,7 +37,12 @@
         "next_btn_default": "SIGUIENTE",
         "download_btn": "DESCARGAR",
         "continue_btn": "CONTINUAR",
-        "finish_btn": "FINALIZAR"
+        "finish_btn": "FINALIZAR",
+        "already_installed_btn": "YA ACABÉ DE INSTALAR",
+        "popup_confirm_title": "VERIFICACIÓN DE RUTA",
+        "popup_confirm_desc": "Windows restringe la modificación de archivos en 'Program Files' (Archivos de Programa). Esto rompe el mod de Realidad Virtual.\n\n¿Confirmas que instalaste el juego en otra carpeta (ej. C:\\Games\\Halo)?",
+        "popup_confirm_btn": "SÍ, CONFIRMO",
+        "popup_cancel_btn": "NO, DÉJAME REVISAR"
       },
       "splash_screen": {
         "title": "HALO CE: VR",
@@ -83,19 +88,20 @@
           "phase": 1
         },
         {
-          "title": "2. INSTALAR",
-          "desc": "Despliegue de archivos en disco local.",
-          "instruction": "1. Monte la ISO.<br>2. Ejecute <strong>Setup.exe</strong>.<br>3. Ruta sugerida: <code class='text-white font-bold'>C:\\Games\\Halo</code>.",
-          "icon": "ph-hard-drives",
-          "phase": 1
-        },
-        {
-          "title": "3. AUTENTICACIÓN",
+          "title": "2. AUTENTICACIÓN",
           "desc": "Clave de licencia requerida.",
           "isKey": true,
           "key": "MHJYD-HCYX4-VC8TD-J32X8-7KD4B",
-          "instruction": "Introduzca la siguiente clave de producto cuando el instalador lo solicite.",
+          "instruction": "Necesitarás esta licencia para instalar Halo: CE. Cópiala haciendo clic en ella antes de continuar.",
           "icon": "ph-key",
+          "phase": 1
+        },
+        {
+          "title": "3. INSTALAR",
+          "desc": "Despliegue de archivos en disco local.",
+          "instruction": "1. Monta la ISO.<br>2. Ejecuta <strong>Setup.exe</strong> e introduce la clave del paso anterior.<br><br><span class='text-red-400 font-bold'>¡IMPORTANTE!</span> Debes instalar tu juego en cualquier carpeta <strong>MENOS en Program Files (Archivos de Programa)</strong>.<br>Ejemplo de ruta correcta: <code class='text-white font-bold bg-white/10 px-2 py-1 rounded'>C:\\Games\\Halo</code>.",
+          "icon": "ph-hard-drives",
+          "isInstallStep": true,
           "phase": 1
         },
         {
@@ -118,7 +124,7 @@
         {
           "title": "5. EJECUCIÓN",
           "desc": "Aplicando parches al sistema...",
-          "instruction": "Ejecute <strong>HaloCEVR_Installer_v1.0.0.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 2.",
+          "instruction": "Ejecute <strong>HaloCEVR_Installer_v1.0.0.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 3.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
@@ -155,7 +161,12 @@
         "next_btn_default": "NEXT",
         "download_btn": "DOWNLOAD",
         "continue_btn": "CONTINUE",
-        "finish_btn": "FINISH"
+        "finish_btn": "FINISH",
+        "already_installed_btn": "I'VE FINISHED INSTALLING",
+        "popup_confirm_title": "PATH VERIFICATION",
+        "popup_confirm_desc": "Windows restricts modifying files inside 'Program Files'. This will break the VR mod.\n\nDo you confirm that you installed the game in a different folder (e.g. C:\\Games\\Halo)?",
+        "popup_confirm_btn": "YES, I CONFIRM",
+        "popup_cancel_btn": "NO, LET ME CHECK"
       },
       "splash_screen": {
         "title": "HALO CE: VR",
@@ -201,19 +212,20 @@
           "phase": 1
         },
         {
-          "title": "2. INSTALL",
-          "desc": "Deploy files to local drive.",
-          "instruction": "1. Mount the ISO.<br>2. Run <strong>Setup.exe</strong>.<br>3. Suggested path: <code class='text-white font-bold'>C:\\Games\\Halo</code>.",
-          "icon": "ph-hard-drives",
-          "phase": 1
-        },
-        {
-          "title": "3. AUTHENTICATION",
+          "title": "2. AUTHENTICATION",
           "desc": "License key required.",
           "isKey": true,
           "key": "MHJYD-HCYX4-VC8TD-J32X8-7KD4B",
-          "instruction": "Enter the following product key when requested by the installer.",
+          "instruction": "You will need this license to install Halo: CE. Click the key to copy it before continuing.",
           "icon": "ph-key",
+          "phase": 1
+        },
+        {
+          "title": "3. INSTALL",
+          "desc": "Deploy files to local drive.",
+          "instruction": "1. Mount the ISO.<br>2. Run <strong>Setup.exe</strong> and enter the key from the previous step.<br><br><span class='text-red-400 font-bold'>IMPORTANT!</span> You must install the game in any folder <strong>EXCEPT 'Program Files'</strong>.<br>Correct path example: <code class='text-white font-bold bg-white/10 px-2 py-1 rounded'>C:\\Games\\Halo</code>.",
+          "icon": "ph-hard-drives",
+          "isInstallStep": true,
           "phase": 1
         },
         {
@@ -236,7 +248,7 @@
         {
           "title": "5. EXECUTION",
           "desc": "Applying system patches...",
-          "instruction": "Run <strong>HaloCEVR_Installer_v1.0.0.exe</strong> and point it to the folder where you installed the game in step 2.",
+          "instruction": "Run <strong>HaloCEVR_Installer_v1.0.0.exe</strong> and point it to the folder where you installed the game in step 3.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
