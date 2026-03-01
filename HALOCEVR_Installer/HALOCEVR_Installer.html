@@ -12,7 +12,6 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        /* Vars & Base */
         :root {
             --bg-deep: #050505;
             --halo-white: #ffffff;
@@ -31,7 +30,6 @@
 
         .font-tech { font-family: 'Rajdhani', monospace; font-weight: 600; }
 
-        /* Background & FX */
         #video-bg-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -10; background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); 
@@ -60,7 +58,6 @@
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
         }
 
-        /* Animations */
         @keyframes slideInRight { 0% { opacity: 0; transform: translateX(30px); } 100% { opacity: 1; transform: translateX(0); } }
         @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes pingSlow { 75%, 100% { transform: scale(2); opacity: 0; } }
@@ -71,7 +68,6 @@
         }
         
         .anim-slide-in { animation: slideInRight 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
-        .anim-fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
         .delay-1 { animation-delay: 100ms; }
         .delay-2 { animation-delay: 200ms; }
         .delay-3 { animation-delay: 300ms; }
@@ -86,7 +82,6 @@
         .reactor-mode .ripple-ring:nth-child(6) { animation-delay: 0.4s !important; }
         .reactor-mode .ripple-ring:nth-child(7) { animation-delay: 0.5s !important; }
 
-        /* UI Components */
         .step-title {
             font-size: 3.5rem; font-weight: 300; margin-bottom: 0.5rem; line-height: 1;
             color: #fff; text-transform: uppercase; letter-spacing: 0.05em;
@@ -137,7 +132,6 @@
         }
         .btn-lang:hover { background: rgba(255,255,255,0.15); border-color: var(--halo-white); }
 
-        /* Layout & Terminals */
         .main-layout {
             display: grid; grid-template-columns: 1fr 0.8fr; height: 100vh;
             opacity: 0; pointer-events: none; transition: opacity 1s ease; position: relative;
@@ -171,6 +165,17 @@
             height: 100%; width: 0%; background: var(--halo-white);
             box-shadow: 0 0 10px var(--halo-white); transition: width 0.3s ease;
         }
+
+        /* CUSTOM MODAL OVERLAY */
+        #custom-modal {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #custom-modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
     </style>
 </head>
 <body>
@@ -181,6 +186,31 @@
     </div>
     <div class="scanlines"></div>
     <div class="noise-overlay"></div>
+
+    <!-- CUSTOM ALERT MODAL -->
+    <div id="custom-modal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="bg-[#0a0a0a] border border-white/20 p-8 max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden transform scale-95 transition-transform duration-300" id="modal-box">
+            <div class="scanlines absolute inset-0 pointer-events-none opacity-30"></div>
+            <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-4 border-b border-white/10 pb-3">
+                    <i id="modal-icon" class="ph ph-warning text-2xl text-terminal-red"></i>
+                    <h2 id="modal-title" class="font-tech text-2xl text-white tracking-widest uppercase">TITLE</h2>
+                </div>
+                <p id="modal-desc" class="font-barlow text-white/80 mb-8 leading-relaxed text-lg">Message</p>
+                <div class="flex justify-end gap-4">
+                    <button id="modal-btn-cancel" class="btn-ghost hidden">CANCELAR</button>
+                    <button id="modal-btn-confirm" class="btn-action !py-2 !px-6 text-sm">ENTENDIDO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXTRACTION LOADER OVERLAY -->
+    <div id="extraction-overlay" class="hidden fixed inset-0 z-[150] flex flex-col items-center justify-center bg-black/90 backdrop-blur-sm transition-opacity duration-300">
+        <i class="ph ph-spinner-gap animate-spin text-white text-6xl mb-6"></i>
+        <div class="font-tech text-white text-xl tracking-[0.4em] uppercase animate-pulse">EXTRACTING FILES</div>
+        <div class="font-tech text-white/50 text-sm tracking-widest mt-2">PLEASE WAIT... DO NOT CLOSE</div>
+    </div>
 
     <div id="boot-screen">
         <div id="boot-logs" class="w-full max-w-lg flex flex-col gap-1 items-start font-tech text-xs md:text-sm text-zinc-400"></div>
@@ -220,7 +250,7 @@
             <div id="content-container"></div>
 
             <div class="absolute bottom-8 left-8 md:left-24 font-tech text-[10px] text-white/30 tracking-[0.2em] flex gap-4">
-                <span id="sys-id">ID: UNSC-SYS // V1.5</span>
+                <span id="sys-id">ID: UNSC-SYS // V1.6</span>
                 <span id="sys-status">STATUS: ONLINE</span>
             </div>
         </div>
@@ -242,30 +272,54 @@
                 splash_title: "HALO CE VR", splash_sub: "UTILIDAD DE INSTALACIÓN", splash_desc: "Este sistema automatizado configurará los componentes necesarios para la realidad virtual en Halo: Combat Evolved. Asegúrese de tener una copia limpia del juego.", btn_start: "INICIAR PROCESO",
                 folder_title: "UBICACIÓN", folder_sub: "DIRECTORIO RAÍZ", folder_desc: "Seleccione la carpeta donde está instalado 'Halo Custom Edition' o 'Halo PC' (asegúrese de haberlo instalado desde el disco original o el instalador web). El sistema buscará 'halo.exe'.", btn_select: "SELECCIONAR RUTA",
                 credits_title: "CRÉDITOS", credits_sub: "COMUNIDAD MODDING", credits_desc: "Este instalador es posible gracias al trabajo increíble de desarrolladores independientes. Se utiliza tecnología de 7-Zip para la descompresión. Apoya a los creadores originales visitando sus repositorios.", btn_thanks: "GRACIAS Y CONTINUAR",
-                core_title: "NÚCLEO VR", core_sub: "FASE 1 DE 5", core_desc: "Instalación del motor de renderizado VR y actualización del ejecutable a la versión 1.0.10. Fundamental para la estereoscopía.", loading_core: "DESCARGANDO RECURSOS...",
-                chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 5", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
-                laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 5", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
-                audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 5", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
-                shortcut_title: "ACCESO DIRECTO", shortcut_sub: "FASE 5 DE 5", shortcut_desc: "Generar un acceso directo 'Halo Launcher' en tu escritorio. Este te permitirá iniciar el juego y alternar fácilmente entre la versión original Flat y la versión VR.", loading_shortcut: "CREANDO LAUNCHER...",
+                core_title: "NÚCLEO VR", core_sub: "FASE 1 DE 6", core_desc: "Instalación del motor de renderizado VR y actualización del ejecutable a la versión 1.0.10. Fundamental para la estereoscopía.", loading_core: "DESCARGANDO RECURSOS...",
+                chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 6", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
+                laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 6", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
+                audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 6", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
+                refined_title: "HALO REFINED", refined_sub: "FASE 5 DE 6", refined_desc: "Proyecto para restaurar la estética y corregir errores del port de Gearbox para estar 1:1 con Xbox. Se hará un respaldo seguro de tu carpeta MAPS y se mejorará la interfaz de VR.", loading_refined: "DESCARGANDO MAPAS (1.2GB)...",
+                shortcut_title: "ACCESO DIRECTO", shortcut_sub: "FASE 6 DE 6", shortcut_desc: "Creando acceso directo 'Halo Launcher' en tu escritorio. Este paso es automático y te permitirá iniciar el juego fácilmente.", loading_shortcut: "CREANDO LAUNCHER...",
                 final_title: "COMPLETADO", final_sub: "SISTEMA LISTO", final_desc: "Todos los componentes han sido instalados. Se ha generado un acceso directo en tu escritorio para iniciar tu juego. ¡Disfruta la experiencia, Spartan!", btn_close: "CERRAR INSTALADOR",
-                btn_install: "INSTALAR", btn_skip: "OMITIR", btn_cancel: "CANCELAR INSTALACIÓN", status_wait: "Esperando comando..."
+                btn_install: "INSTALAR", btn_skip: "OMITIR", btn_cancel: "CANCELAR INSTALACIÓN", status_wait: "Esperando comando...",
+                // Popups Strings
+                modal_vr_title: "INSTRUCCIÓN CRÍTICA DE VR",
+                modal_vr_desc: "Al inicio de la campaña, en la primera interacción cuando te pidan mover la cabeza, <span class='text-terminal-red font-bold'>DEBES mover el mouse de forma obligatoria</span>. Es el único momento en todo el juego donde se requiere. Usa tu mouse real por 2 segundos.",
+                modal_vr_btn: "ENTENDIDO",
+                modal_launcher_title: "ADVERTENCIA DE INICIO",
+                modal_launcher_desc: "<span class='text-terminal-red font-bold'>DEBES iniciar el juego desde el nuevo Launcher</span>. De lo contrario, el Flood aparecerá en la puerta de tu habitación (mentira, pero causarás bugs extraños que el launcher solventa).",
+                modal_launcher_btn: "SALIR AL ESCRITORIO",
+                modal_refined_title: "ADVERTENCIA: MULTIJUGADOR",
+                modal_refined_desc: "Si instalas Halo Refined, es muy probable que <span class='text-terminal-red font-bold'>no puedas acceder al multijugador</span> debido a que modifica los mapas originales. ¿Deseas continuar?",
+                modal_btn_yes: "SÍ, INSTALAR",
+                modal_btn_no: "CANCELAR"
             },
             en: {
                 lang_title: "LANGUAGE / IDIOMA", lang_sub: "INITIAL SETUP", lang_desc: "Select your preferred language for the installer interface.",
                 splash_title: "HALO CE VR", splash_sub: "INSTALLATION UTILITY", splash_desc: "This automated system will configure the necessary components for Virtual Reality in Halo: Combat Evolved. Ensure you have a clean copy of the game.", btn_start: "START PROCESS",
                 folder_title: "LOCATION", folder_sub: "ROOT DIRECTORY", folder_desc: "Select the folder where 'Halo Custom Edition' or 'Halo PC' is installed (ensure you have a valid installation from the original disc or web installer). The system will look for 'halo.exe'.", btn_select: "SELECT PATH",
                 credits_title: "CREDITS", credits_sub: "MODDING COMMUNITY", credits_desc: "This installer is made possible by the incredible work of independent developers. We utilize 7-Zip technology for file decompression. Please support the original creators by checking out their repositories.", btn_thanks: "THANKS & CONTINUE",
-                core_title: "VR CORE", core_sub: "PHASE 1 OF 5", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
-                chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 5", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
-                laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 5", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
-                audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 5", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
-                shortcut_title: "SHORTCUT", shortcut_sub: "PHASE 5 OF 5", shortcut_desc: "Generate a 'Halo Launcher' shortcut on your desktop. This will allow you to easily launch the game and toggle between the original Flat version and the VR version.", loading_shortcut: "CREATING LAUNCHER...",
+                core_title: "VR CORE", core_sub: "PHASE 1 OF 6", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
+                chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 6", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
+                laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 6", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
+                audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 6", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
+                refined_title: "HALO REFINED", refined_sub: "PHASE 5 OF 6", refined_desc: "Project to restore aesthetics and fix bugs from the Gearbox port to be 1:1 with Xbox. A secure backup of your MAPS folder will be created and VR UI will be upgraded.", loading_refined: "DOWNLOADING MAPS (1.2GB)...",
+                shortcut_title: "SHORTCUT", shortcut_sub: "PHASE 6 OF 6", shortcut_desc: "Creating 'Halo Launcher' shortcut on your desktop. This step is automatic and will allow you to launch the game easily.", loading_shortcut: "CREATING LAUNCHER...",
                 final_title: "COMPLETE", final_sub: "SYSTEM READY", final_desc: "All components successfully installed. A shortcut has been generated on your desktop to launch your game. Enjoy the experience, Spartan!", btn_close: "CLOSE INSTALLER",
-                btn_install: "INSTALL", btn_skip: "SKIP", btn_cancel: "CANCEL INSTALLATION", status_wait: "Waiting for command..."
+                btn_install: "INSTALL", btn_skip: "SKIP", btn_cancel: "CANCEL INSTALLATION", status_wait: "Waiting for command...",
+                // Popups Strings
+                modal_vr_title: "CRITICAL VR INSTRUCTION",
+                modal_vr_desc: "At the start of the campaign, during the first interaction when asked to look around, <span class='text-terminal-red font-bold'>you MUST move your physical mouse</span>. This is the only time in the game it is required.",
+                modal_vr_btn: "UNDERSTOOD",
+                modal_launcher_title: "LAUNCH WARNING",
+                modal_launcher_desc: "<span class='text-terminal-red font-bold'>You MUST start the game using the Launcher</span>. Otherwise, the Flood will appear at your bedroom door (just kidding, but it prevents weird bugs that the launcher fixes).",
+                modal_launcher_btn: "EXIT TO DESKTOP",
+                modal_refined_title: "WARNING: MULTIPLAYER",
+                modal_refined_desc: "If you install Halo Refined, you will highly likely <span class='text-terminal-red font-bold'>lose access to multiplayer</span> due to modified map files. Do you wish to continue?",
+                modal_btn_yes: "YES, INSTALL",
+                modal_btn_no: "CANCEL"
             }
         };
 
-        const FLOW = ['splash', 'folder', 'credits', 'core', 'chimera', 'laa', 'audio', 'shortcut', 'final'];
+        const FLOW = ['splash', 'folder', 'credits', 'core', 'chimera', 'laa', 'audio', 'refined', 'shortcut', 'final'];
         let currentLang = 'en';
         let currentStepKey = 'language';
         let isProcessing = false;
@@ -376,6 +430,63 @@
             }
         }
 
+        // LOADER DE EXTRACCIÓN 
+        function showExtractionLoader(show) {
+            const overlay = document.getElementById('extraction-overlay');
+            if (show) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // SISTEMA DE MODALES PERSONALIZADOS
+        function showCustomModal(title, desc, confirmText, cancelText, onConfirm, onCancel, iconClass = "ph-warning text-terminal-red") {
+            const modal = document.getElementById('custom-modal');
+            const modalBox = document.getElementById('modal-box');
+            const icon = document.getElementById('modal-icon');
+            
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerHTML = desc;
+            
+            icon.className = `ph ${iconClass} text-3xl`;
+
+            const btnConfirm = document.getElementById('modal-btn-confirm');
+            const btnCancel = document.getElementById('modal-btn-cancel');
+            
+            btnConfirm.innerText = confirmText || 'OK';
+            btnConfirm.onclick = () => {
+                modal.classList.remove('show');
+                modalBox.classList.remove('scale-100');
+                modalBox.classList.add('scale-95');
+                setTimeout(() => {
+                    if(onConfirm) onConfirm();
+                }, 300); // Wait for transition
+            };
+
+            if (cancelText) {
+                btnCancel.innerText = cancelText;
+                btnCancel.classList.remove('hidden');
+                btnCancel.onclick = () => {
+                    modal.classList.remove('show');
+                    modalBox.classList.remove('scale-100');
+                    modalBox.classList.add('scale-95');
+                    setTimeout(() => {
+                        if(onCancel) onCancel();
+                    }, 300);
+                };
+            } else {
+                btnCancel.classList.add('hidden');
+            }
+
+            modal.classList.add('show');
+            setTimeout(() => {
+                modalBox.classList.remove('scale-95');
+                modalBox.classList.add('scale-100');
+            }, 10);
+        }
+
+
         function renderStep(key) {
             currentStepKey = key;
             const container = document.getElementById('content-container');
@@ -413,11 +524,12 @@
                 splash: { icon: "ph-fingerprint", action: null },
                 folder: { icon: "ph-folder-notch-open", action: "selectFolder" },
                 credits: { icon: "ph-users", action: null },
-                core: { icon: "ph-cube", action: "installCore" },
+                core: { icon: "ph-cube", action: "installCore", skip: false },
                 chimera: { icon: "ph-aperture", action: "installChimera", skip: true },
                 laa: { icon: "ph-memory", action: "installLAA", skip: true },
                 audio: { icon: "ph-speaker-high", action: "installAudio", skip: true },
-                shortcut: { icon: "ph-desktop", action: "installShortcut", skip: true },
+                refined: { icon: "ph-sparkle", action: "installRefined", skip: true },
+                shortcut: { icon: "ph-desktop", action: "installShortcut", auto: true }, // Automatic phase
                 final: { icon: "ph-check-circle", action: "finish" }
             };
 
@@ -428,6 +540,7 @@
             const sub = text[`${key}_sub`];
             const desc = text[`${key}_desc`];
             const loadingTxt = text[`loading_${key}`] || "PROCESSING...";
+            const isAuto = data.auto === true;
 
             let html = `
                 <div class="anim-slide-in delay-1">
@@ -455,12 +568,12 @@
                             </div>
                             <div class="text-white/50 text-xs">by SnowyMouse</div>
                         </div>
-                        <div onclick="openUrl('https://halocevr.com/')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
+                        <div onclick="openUrl('https://www.proxeninc.net/Halo/Refined/')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-white font-tech text-lg">HoriZon Guide</span>
+                                <span class="text-white font-tech text-lg">Halo Refined</span>
                                 <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
                             </div>
-                            <div class="text-white/50 text-xs">Community Tool</div>
+                            <div class="text-white/50 text-xs">by Proxeninc / Community</div>
                         </div>
                         <div onclick="openUrl('https://github.com/ThreeDeeJay/dsoal')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
                             <div class="flex justify-between items-center mb-1">
@@ -468,13 +581,6 @@
                                 <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
                             </div>
                             <div class="text-white/50 text-xs">by ThreeDeeJay</div>
-                        </div>
-                        <div onclick="openUrl('https://www.7-zip.org/')" class="col-span-2 p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-white font-tech text-lg">7-Zip Technology</span>
-                                <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
-                            </div>
-                            <div class="text-white/50 text-xs">File decompression engine by Igor Pavlov</div>
                         </div>
                     </div>
                     <div class="flex gap-4 anim-slide-in delay-3">
@@ -494,7 +600,7 @@
             } else if (key === 'final') {
                 html += `<button onclick="triggerPythonAction('close')" class="btn-action">${text.btn_close}</button>`;
             } else {
-                if(!isProcessing) {
+                if (!isAuto && !isProcessing) {
                     html += `<button id="btn-main-action" onclick="triggerPythonAction('${data.action}')" class="btn-action">${text.btn_install}</button>`;
                     if (data.skip) html += `<button onclick="skipStep('${key}')" class="btn-ghost">${text.btn_skip}</button>`;
                 }
@@ -502,7 +608,7 @@
             html += `</div>`;
 
             html += `
-                <div id="processing-area" class="hidden mt-6 w-full max-w-md anim-slide-in">
+                <div id="processing-area" class="${isAuto ? '' : 'hidden'} mt-6 w-full max-w-md anim-slide-in">
                     <div class="flex justify-between items-end mb-1">
                         <span class="font-tech text-xs tracking-widest text-white/70 uppercase" id="loading-label">${loadingTxt}</span>
                         <span class="font-mono text-xs text-white" id="progress-text">0%</span>
@@ -513,11 +619,56 @@
             `;
 
             container.innerHTML = html;
+
+            if (isAuto) {
+                isProcessing = true;
+                setTimeout(() => triggerPythonAction(data.action), 1500);
+            }
+        }
+
+        function executeRealAction(actionName) {
+            isProcessing = true;
+            const btnMain = document.getElementById('btn-main-action');
+            if(btnMain) btnMain.parentElement.style.display = 'none';
+            document.getElementById('processing-area').classList.remove('hidden');
+
+            if (window.pywebview) {
+                let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4, installRefined: 5, installShortcut: 6 }[actionName] || 0;
+                window.pywebview.api.run_stage(stage);
+            } else {
+                simulateProgress();
+            }
         }
 
         function triggerPythonAction(actionName) {
+            const text = i18n[currentLang];
+
+            // 1. POPUP DE CIERRE (Secuencia de 2 mensajes)
             if (actionName === 'close') {
-                window.pywebview ? window.pywebview.api.quit_app() : window.close();
+                showCustomModal(
+                    text.modal_vr_title, 
+                    text.modal_vr_desc, 
+                    text.modal_vr_btn, 
+                    null, 
+                    () => {
+                        // Después de confirmar la advertencia de VR, mostramos la del Launcher
+                        setTimeout(() => {
+                            showCustomModal(
+                                text.modal_launcher_title,
+                                text.modal_launcher_desc,
+                                text.modal_launcher_btn,
+                                null,
+                                () => {
+                                    window.pywebview ? window.pywebview.api.quit_app() : window.close();
+                                },
+                                null,
+                                "ph-rocket text-terminal-green"
+                            );
+                        }, 200);
+                    },
+                    null,
+                    "ph-headset text-terminal-green"
+                );
                 return;
             }
 
@@ -541,17 +692,21 @@
                 return;
             }
 
-            isProcessing = true;
-            const btnMain = document.getElementById('btn-main-action');
-            if(btnMain) btnMain.parentElement.style.display = 'none';
-            document.getElementById('processing-area').classList.remove('hidden');
-
-            if (window.pywebview) {
-                let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4, installShortcut: 5 }[actionName] || 0;
-                window.pywebview.api.run_stage(stage);
-            } else {
-                simulateProgress();
+            // 2. POPUP ANTES DE REFINED
+            if (actionName === 'installRefined') {
+                showCustomModal(
+                    text.modal_refined_title,
+                    text.modal_refined_desc,
+                    text.modal_btn_yes,
+                    text.modal_btn_no,
+                    () => { executeRealAction(actionName); }, // Si presiona "Sí, instalar"
+                    () => { /* Si cancela, no hacemos nada */ }
+                );
+                return;
             }
+
+            // Si es cualquier otra acción, ejecutar normalmente
+            executeRealAction(actionName);
         }
 
         function skipStep(currentKey) {
@@ -565,7 +720,7 @@
             const p = document.createElement('div');
             p.innerText = `> ${text}`;
             if(text.toLowerCase().includes('error')) p.style.color = 'var(--terminal-red)';
-            if(text.toLowerCase().includes('ok') || text.toLowerCase().includes('complete') || text.toLowerCase().includes('correctamente')) p.style.color = 'var(--terminal-green)';
+            if(text.toLowerCase().includes('ok') || text.toLowerCase().includes('complete') || text.toLowerCase().includes('correctamente') || text.toLowerCase().includes('successfully')) p.style.color = 'var(--terminal-green)';
             terminal.prepend(p);
         }
 
@@ -587,10 +742,12 @@
         function simulateProgress() {
             let p = 0;
             updateConsole("Simulating process...");
+            showExtractionLoader(true);
             const int = setInterval(() => {
                 p+=5; updateProgress(p);
                 if(p >= 100) {
                     clearInterval(int);
+                    showExtractionLoader(false);
                     updateConsole("Operation complete.");
                     phaseComplete(1); 
                 }

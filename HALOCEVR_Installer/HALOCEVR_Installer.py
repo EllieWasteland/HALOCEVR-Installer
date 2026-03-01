@@ -8,18 +8,19 @@ import shutil
 import subprocess
 import webview
 import webbrowser
-import win32com.client  # Importado para la creación del acceso directo
+import win32com.client
 from tkinter import Tk, filedialog
 
-# --- CONFIGURACIÓN DE RECURSOS ---
+# --- RESOURCE CONFIGURATION ---
 URL_HALO_VR = "https://github.com/LivingFray/HaloCEVR/releases/download/1.4.0/HaloCEVR.zip"
 URL_CHIMERA = "https://github.com/SnowyMouse/chimera/releases/download/1.0.0r1200/chimera-1.0.0r1200.7z"
 URL_DSOAL = "https://github.com/ThreeDeeJay/dsoal/releases/download/0.9.6/DSOAL+HRTF.zip"
+URL_REFINED = "https://www.proxeninc.net/Halo/Refined/Refined%20V5%20Download/halo_refined_retail_en_v5.01.7z"
 
-# Nombres de archivos locales esperados
+# Expected local filenames
 PATCH_EXE_NAME = "halopc-patch-1.0.10.exe"
 LOCAL_LAA_EXE = "halo.exe" 
-LAUNCHER_EXE_NAME = "HaloLauncher.exe" # Nombre del launcher compilado a copiar
+LAUNCHER_EXE_NAME = "HaloLauncher.exe"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMP_DIR = os.path.join(BASE_DIR, "temp_install_files")
@@ -28,18 +29,17 @@ INTERFACE_PATH = os.path.join(BASE_DIR, "HALOCEVR_Installer.html")
 class Api:
     def __init__(self):
         self.game_path = None
-        self.installed_mods = []  # Para llevar registro de lo instalado
+        self.installed_mods = []
         if not os.path.exists(TEMP_DIR): os.makedirs(TEMP_DIR)
 
     def select_folder(self):
-        """Abre el diálogo nativo para seleccionar carpeta."""
+        """Native folder selection dialog."""
         root = Tk()
         root.withdraw()
         folder_selected = filedialog.askdirectory(title="Select Halo CE Root Folder / Seleccionar Carpeta Raíz")
         root.destroy()
         
         if folder_selected:
-            # Validación
             if not os.path.exists(os.path.join(folder_selected, "halo.exe")) and \
                not os.path.exists(os.path.join(folder_selected, "halo.old.exe")):
                 self.log("WARNING: halo.exe not found in target directory.")
@@ -49,21 +49,17 @@ class Api:
         return None
 
     def quit_app(self):
-        """Cierra la aplicación completamente destruyendo la ventana y el proceso."""
-        self.log("Cerrando instalador...")
+        self.log("Closing installer...")
         if 'window' in globals() and window:
             window.destroy()
-        # Matamos el proceso para asegurar que los hilos no queden colgados
+        # Kill process to ensure threads don't hang
         os._exit(0)
 
     def open_url(self, url):
-        """Abre enlaces en el navegador predeterminado del sistema."""
         webbrowser.open(url)
 
     def generate_log(self, lang):
-        """Genera un archivo .txt con el resumen de la instalación en la carpeta del juego."""
-        if not self.game_path: 
-            return
+        if not self.game_path: return
         try:
             log_path = os.path.join(self.game_path, "HaloVR_Install_Log.txt")
             with open(log_path, "w", encoding="utf-8") as f:
@@ -79,6 +75,8 @@ class Api:
                         f.write("- Parche LAA: Ejecutable halo.exe actualizado para aprovechar 4GB de RAM.\n")
                     if 'audio' in self.installed_mods:
                         f.write("- Audio 3D (DSOAL): Bibliotecas HRTF espaciales configuradas con alsoft.ini.\n")
+                    if 'refined' in self.installed_mods:
+                        f.write("- Halo Refined: Mapas originales respaldados, campaña actualizada y HUD adaptado para VR.\n")
                     if 'shortcut' in self.installed_mods:
                         f.write("- Launcher Integrado: Se ha copiado 'Halo Launcher.exe' y creado un acceso directo en el escritorio.\n")
                     f.write("\n¡El proceso ha finalizado correctamente! Ya puedes ejecutar el juego.\n")
@@ -94,6 +92,8 @@ class Api:
                         f.write("- LAA Patch: halo.exe updated to access 4GB of RAM.\n")
                     if 'audio' in self.installed_mods:
                         f.write("- 3D Audio (DSOAL): HRTF spatial libraries configured alongside alsoft.ini.\n")
+                    if 'refined' in self.installed_mods:
+                        f.write("- Halo Refined: Original maps backed up, campaign upgraded and VR HUD scaled.\n")
                     if 'shortcut' in self.installed_mods:
                         f.write("- Custom Launcher: 'Halo Launcher.exe' copied and desktop shortcut generated.\n")
                     f.write("\nProcess completed successfully! You can now launch the game.\n")
@@ -121,16 +121,12 @@ class Api:
     def _execute_stage(self, stage_num):
         start_time = time.time()
         try:
-            if stage_num == 1:
-                self._stage_1_core_vr()
-            elif stage_num == 2:
-                self._stage_2_chimera()
-            elif stage_num == 3:
-                self._stage_3_laa()
-            elif stage_num == 4:
-                self._stage_4_audio()
-            elif stage_num == 5:
-                self._stage_5_shortcut() # Nueva Fase: Launcher
+            if stage_num == 1: self._stage_1_core_vr()
+            elif stage_num == 2: self._stage_2_chimera()
+            elif stage_num == 3: self._stage_3_laa()
+            elif stage_num == 4: self._stage_4_audio()
+            elif stage_num == 5: self._stage_5_refined()
+            elif stage_num == 6: self._stage_6_shortcut()
             
             elapsed = time.time() - start_time
             if elapsed < 1.0: time.sleep(1.0 - elapsed)
@@ -148,7 +144,12 @@ class Api:
                 clean_err = str(e).replace('"', "'").replace('\n', ' ')
                 window.evaluate_js(f'installationError("{clean_err}")')
 
-    # --- UTILIDADES DE ARCHIVO ---
+        finally:
+            # Always ensure loader is hidden after failure or success
+            if 'window' in globals() and window:
+                window.evaluate_js('showExtractionLoader(false)')
+
+    # --- FILE UTILITIES ---
     def _download_file(self, url, dest_path):
         self.log(f"Downloading: {os.path.basename(dest_path)}")
         try:
@@ -169,19 +170,34 @@ class Api:
         except Exception as e:
             raise Exception(f"Download failed: {e}")
 
+    def _extract_zip(self, archive, dest):
+        self.log(f"Unzipping {os.path.basename(archive)}...")
+        if 'window' in globals() and window:
+            window.evaluate_js('showExtractionLoader(true)')
+        try:
+            with zipfile.ZipFile(archive, 'r') as z: 
+                z.extractall(dest)
+        finally:
+            if 'window' in globals() and window:
+                window.evaluate_js('showExtractionLoader(false)')
+
     def _extract_7z_robust(self, archive, dest):
         self.log("Extracting archive (7z) using local 7z.exe...")
         seven_zip_path = os.path.join(BASE_DIR, "7z.exe")
         
-        if os.path.exists(seven_zip_path):
-            try:
-                # Se utiliza el 7z.exe local de forma silenciosa (sin ventana)
-                subprocess.run([seven_zip_path, 'x', archive, f'-o{dest}', '-y'], 
-                               check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-            except Exception as e:
-                raise Exception(f"7z Extraction failed. Error: {str(e)}")
-        else:
-            raise Exception("No se encontró 7z.exe. Por favor, asegúrate de incluir 7z.exe en la misma carpeta que el instalador.")
+        if not os.path.exists(seven_zip_path):
+            raise Exception("7z.exe not found in installer directory.")
+
+        if 'window' in globals() and window:
+            window.evaluate_js('showExtractionLoader(true)')
+        try:
+            subprocess.run([seven_zip_path, 'x', archive, f'-o{dest}', '-y'], 
+                           check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        except Exception as e:
+            raise Exception(f"7z Extraction failed. Error: {str(e)}")
+        finally:
+            if 'window' in globals() and window:
+                window.evaluate_js('showExtractionLoader(false)')
 
     def _backup_file(self, filename):
         target = os.path.join(self.game_path, filename)
@@ -197,7 +213,7 @@ class Api:
                     pass
         return False
 
-    # --- FASES DE INSTALACIÓN ---
+    # --- INSTALLATION PHASES ---
 
     def _stage_1_core_vr(self):
         self.log("--- MODULE 1: CORE VR ---")
@@ -206,9 +222,6 @@ class Api:
         if os.path.exists(patch_path):
             self.log("Running Patch 1.0.10...")
             try:
-                # CORRECCIÓN PARA ELLIE: 
-                # Usamos PowerShell con -Wait para pausar el script de Python hasta que termine, 
-                # pero quitamos "-Verb RunAs" porque el .exe compilado ya tendrá esos permisos globales.
                 cmd = ["powershell", "Start-Process", f'"{patch_path}"', "-Wait"]
                 subprocess.run(cmd, shell=True, check=True)
             except Exception as e:
@@ -219,11 +232,10 @@ class Api:
         vr_zip = os.path.join(TEMP_DIR, "HaloCEVR.zip")
         if not os.path.exists(vr_zip): self._download_file(URL_HALO_VR, vr_zip)
         
-        self.log("Unzipping VR assets...")
         extract_path = os.path.join(TEMP_DIR, "HaloVR_Extracted")
         if os.path.exists(extract_path): shutil.rmtree(extract_path)
         
-        with zipfile.ZipFile(vr_zip, 'r') as z: z.extractall(extract_path)
+        self._extract_zip(vr_zip, extract_path)
         
         self.log("Installing files to directory...")
         shutil.copytree(extract_path, self.game_path, dirs_exist_ok=True)
@@ -316,7 +328,7 @@ class Api:
         if not os.path.exists(dsoal_zip): self._download_file(URL_DSOAL, dsoal_zip)
         
         ext_audio = os.path.join(TEMP_DIR, "DSOAL_Extracted")
-        with zipfile.ZipFile(dsoal_zip, 'r') as z: z.extractall(ext_audio)
+        self._extract_zip(dsoal_zip, ext_audio)
 
         self.log("Installing DSOAL libraries...")
         source_dir = ext_audio
@@ -338,54 +350,99 @@ class Api:
             f.write(alsoft_content)
         self.installed_mods.append('audio')
 
-    def _stage_5_shortcut(self):
-        """Copia el Launcher compilado (Halo Launcher.exe) y crea un acceso directo en el escritorio."""
-        self.log("--- MODULE 5: LAUNCHER & SHORTCUT ---")
+    def _stage_5_refined(self):
+        self.log("--- MODULE 5: HALO REFINED ---")
+        
+        refined_7z = os.path.join(TEMP_DIR, "halo_refined.7z")
+        if not os.path.exists(refined_7z): 
+            self._download_file(URL_REFINED, refined_7z)
+        
+        ext_refined = os.path.join(TEMP_DIR, "Refined_Extracted")
+        if os.path.exists(ext_refined): 
+            shutil.rmtree(ext_refined)
+            
+        self._extract_7z_robust(refined_7z, ext_refined)
+
+        # 1. Backup original MAPS folder
+        maps_dir = os.path.join(self.game_path, "MAPS")
+        maps_backup = os.path.join(self.game_path, "MAPS_original")
+        
+        if os.path.exists(maps_dir) and not os.path.exists(maps_backup):
+            self.log("Creating backup of MAPS folder (MAPS -> MAPS_original)...")
+            shutil.copytree(maps_dir, maps_backup)
+        else:
+            self.log("MAPS_original backup exists or MAPS not found. Skipping.")
+
+        # 2. Copy mod files over MAPS
+        self.log("Installing Halo Refined maps...")
+        source_maps = None
+        for root, dirs, files in os.walk(ext_refined):
+            if any(f.lower().endswith(".map") for f in files):
+                source_maps = root
+                break
+                
+        if source_maps:
+            shutil.copytree(source_maps, maps_dir, dirs_exist_ok=True)
+            self.log("Refined MAPS copied successfully.")
+        else:
+            self.log("WARNING: No .map files found in Refined download.")
+
+        # 3. Apply HUD/Crosshair Fix for VR
+        vr_config_path = os.path.join(self.game_path, "VR", "config.txt")
+        if os.path.exists(vr_config_path):
+            self.log("Adjusting UIOverlay in VR config...")
+            try:
+                with open(vr_config_path, "a", encoding="utf-8") as f:
+                    f.write("\n\n//[Int] Width of the UI overlay in pixels (Default Value: 600)\n")
+                    f.write("UIOverlayWidth = 1800\n")
+                    f.write("//[Int] Height of the UI overlay in pixels (Default Value: 600)\n")
+                    f.write("UIOverlayHeight = 1800\n")
+                self.log("HUD fix applied correctly.")
+            except Exception as e:
+                self.log(f"Error writing to VR/config.txt: {str(e)}")
+        else:
+            self.log("WARNING: VR/config.txt not found. HUD fix skipped.")
+
+        self.installed_mods.append('refined')
+
+    def _stage_6_shortcut(self):
+        self.log("--- MODULE 6: LAUNCHER & SHORTCUT ---")
         
         launcher_src = os.path.join(BASE_DIR, LAUNCHER_EXE_NAME)
         launcher_dst = os.path.join(self.game_path, LAUNCHER_EXE_NAME)
         
-        # 1. Copiar el launcher a la carpeta del juego
         if os.path.exists(launcher_src):
-            self.log(f"Copiando {LAUNCHER_EXE_NAME} al directorio del juego...")
+            self.log(f"Copying {LAUNCHER_EXE_NAME} to game directory...")
             try:
                 shutil.copy2(launcher_src, launcher_dst)
             except Exception as e:
-                self.log(f"Error copiando launcher: {str(e)}")
+                self.log(f"Error copying launcher: {str(e)}")
         else:
-            self.log(f"ADVERTENCIA: No se encontró '{LAUNCHER_EXE_NAME}' junto al instalador. Revisa que lo hayas compilado.")
+            self.log(f"WARNING: '{LAUNCHER_EXE_NAME}' not found.")
             launcher_dst = None
             
         if not launcher_dst:
-            self.log("Saltando creación de acceso directo: Archivo origen no encontrado.")
+            self.log("Skipping shortcut creation: Source launcher not found.")
             return
 
-        # 2. Crear el acceso directo usando win32com.client
-        self.log("Generando acceso directo en el Escritorio...")
+        self.log("Generating Desktop Shortcut...")
         try:
             desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
             shortcut_path = os.path.join(desktop, 'Halo CE Launcher.lnk')
-            # Usamos el ícono del juego para el acceso directo
             icon_path = os.path.join(self.game_path, "halo.exe")
             
-            # Inicializar el objeto de Windows Script Host
             shell = win32com.client.Dispatch("WScript.Shell")
-            
-            # Crear el objeto del acceso directo
             acceso_directo = shell.CreateShortCut(shortcut_path)
             
-            # Configurar las propiedades principales
             acceso_directo.TargetPath = launcher_dst
             acceso_directo.WorkingDirectory = self.game_path
             acceso_directo.IconLocation = f"{icon_path}, 0"
-            
-            # Guardar el archivo .lnk en el disco
             acceso_directo.Save()
             
             self.installed_mods.append('shortcut')
-            self.log("Acceso directo creado correctamente.")
+            self.log("Shortcut created successfully.")
         except Exception as e:
-            self.log(f"Error al crear el acceso directo: {str(e)}")
+            self.log(f"Error creating shortcut: {str(e)}")
 
 
 if __name__ == '__main__':
