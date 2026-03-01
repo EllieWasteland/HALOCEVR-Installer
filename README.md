@@ -1,4 +1,4 @@
-# Halo CE VR: Automated Installer
+# Halo CE VR: Autumn Installer
 
 <div align="center">
 
