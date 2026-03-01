@@ -124,7 +124,7 @@
         {
           "title": "5. EJECUCIÓN",
           "desc": "Aplicando parches al sistema...",
-          "instruction": "Ejecute <strong>HaloCEVR_Installer_v1.0.0.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 3.",
+          "instruction": "Ejecute <strong>HaloCEVR_Installer.exe</strong> y apunte a la carpeta donde instaló el juego en el paso 3.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
@@ -248,7 +248,7 @@
         {
           "title": "5. EXECUTION",
           "desc": "Applying system patches...",
-          "instruction": "Run <strong>HaloCEVR_Installer_v1.0.0.exe</strong> and point it to the folder where you installed the game in step 3.",
+          "instruction": "Run <strong>HaloCEVR_Installer.exe</strong> and point it to the folder where you installed the game in step 3.",
           "icon": "ph-terminal-window",
           "phase": 2
         },
