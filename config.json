@@ -114,7 +114,7 @@
         {
           "title": "4. AUTOINSTALADOR VR",
           "desc": "Herramienta de modificación.",
-          "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches SPV3 y Chimera necesarios.",
+          "instruction": "Descargue el <strong>Halo VR Installer</strong>. Este ejecutable contiene los parches necesarios.",
           "isDownload": true,
           "showSkip": true,
           "url": "https://github.com/EllieWasteland/HALOCEVR-Installer/releases/download/v1.0.0-beta/HALOCEVR_Installer.exe",
