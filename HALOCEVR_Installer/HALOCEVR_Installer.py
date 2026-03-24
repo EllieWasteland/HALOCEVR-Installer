@@ -8,8 +8,8 @@ import shutil
 import subprocess
 import webview
 import webbrowser
-import win32com.client
 from tkinter import Tk, filedialog
+from pyshortcuts import make_shortcut  # Reemplazamos win32com por pyshortcuts
 
 # --- RESOURCE CONFIGURATION ---
 URL_HALO_VR = "https://github.com/LivingFray/HaloCEVR/releases/download/1.4.0/HaloCEVR.zip"
@@ -425,22 +425,22 @@ class Api:
             self.log("Skipping shortcut creation: Source launcher not found.")
             return
 
-        self.log("Generating Desktop Shortcut...")
+        self.log("Generating Desktop Shortcut usando pyshortcuts...")
         try:
-            desktop = os.path.join(os.environ['USERPROFILE'], 'Desktop')
-            shortcut_path = os.path.join(desktop, 'Halo CE Launcher.lnk')
-            icon_path = os.path.join(self.game_path, "halo.exe")
-            
-            shell = win32com.client.Dispatch("WScript.Shell")
-            acceso_directo = shell.CreateShortCut(shortcut_path)
-            
-            acceso_directo.TargetPath = launcher_dst
-            acceso_directo.WorkingDirectory = self.game_path
-            acceso_directo.IconLocation = f"{icon_path}, 0"
-            acceso_directo.Save()
+            # Reemplazamos win32com por pyshortcuts y vinculamos el icono al mismo ejecutable
+            make_shortcut(
+                script=launcher_dst,       # Apunta directamente al HaloLauncher.exe en la ruta seleccionada
+                executable=launcher_dst,   
+                name='Halo CE Launcher',
+                description='Launcher de Halo CE VR',
+                icon=launcher_dst,         # Usa el icono del mismo HaloLauncher.exe
+                terminal=False,    
+                desktop=True,      
+                startmenu=True
+            )
             
             self.installed_mods.append('shortcut')
-            self.log("Shortcut created successfully.")
+            self.log("Shortcut created successfully con pyshortcuts.")
         except Exception as e:
             self.log(f"Error creating shortcut: {str(e)}")
 

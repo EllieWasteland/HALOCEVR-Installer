@@ -80,11 +80,11 @@
         {
           "title": "1. OBTENER HALO CE",
           "desc": "Adquisición de archivos fuente.",
-          "instruction": "Descargue la imagen de disco (ISO) original. Si dispone del medio físico, inserte el disco ahora.",
+          "instruction": "Descargue el instalador del juego. Si ya dispone del instalador, puede omitir este paso.",
           "isDownload": true,
           "showSkip": true,
-          "url": "https://archive.org/download/HaloCEPC/HALO.iso",
-          "icon": "ph-disc",
+          "url": "https://www.proxeninc.net/Halo/Refined/Game%20Installer/halocesetup_es_1.00.exe",
+          "icon": "ph-download-simple",
           "phase": 1
         },
         {
@@ -99,7 +99,7 @@
         {
           "title": "3. INSTALAR",
           "desc": "Despliegue de archivos en disco local.",
-          "instruction": "1. Monta la ISO.<br>2. Ejecuta <strong>Setup.exe</strong> e introduce la clave del paso anterior.<br><br><span class='text-red-400 font-bold'>¡IMPORTANTE!</span> Debes instalar tu juego en cualquier carpeta <strong>MENOS en Program Files (Archivos de Programa)</strong>.<br>Ejemplo de ruta correcta: <code class='text-white font-bold bg-white/10 px-2 py-1 rounded'>C:\\Games\\Halo</code>.",
+          "instruction": "1. Ejecuta <strong>halocesetup_es_1.00.exe</strong> e introduce la clave del paso anterior.<br><br><span class='text-red-400 font-bold'>¡IMPORTANTE!</span> Debes instalar tu juego en cualquier carpeta <strong>MENOS en Program Files (Archivos de Programa)</strong>.<br>Ejemplo de ruta correcta: <code class='text-white font-bold bg-white/10 px-2 py-1 rounded'>C:\\Games\\Halo</code>.",
           "icon": "ph-hard-drives",
           "isInstallStep": true,
           "phase": 1
