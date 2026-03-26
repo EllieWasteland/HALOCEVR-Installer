@@ -67,7 +67,6 @@ Installation has been designed to be as painless as possible.
 
 The project is under active development. Planned additions for upcoming releases include:
 
-- **Integrated HD Texture Packs** — Preconfigured high-resolution texture bundles tuned to avoid VR performance impact.
 - **Native Uninstaller** — A built-in option to cleanly revert all changes and restore the game to its original vanilla state.
 
 ---
