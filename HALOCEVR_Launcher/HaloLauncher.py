@@ -3,9 +3,9 @@ import sys
 import subprocess
 import threading
 import time
-import ctypes
-from ctypes import wintypes
 import webview
+import psutil
+from pywinauto import Application
 
 def get_game_dir():
     if getattr(sys, 'frozen', False):
@@ -17,13 +17,40 @@ EXE_PATH = os.path.join(GAME_DIR, "halo.exe")
 D3D9_DLL = os.path.join(GAME_DIR, "d3d9.dll")
 D3D9_BAK = os.path.join(GAME_DIR, "d3d9.old.dll")
 
+def is_halo_running():
+    for proc in psutil.process_iter(['name']):
+        try:
+            if proc.info['name'] and proc.info['name'].lower() == "halo.exe":
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False
+
+def focus_halo_window():
+    try:
+        app = Application().connect(title_re="^Halo$")
+        ventana = app.top_window()
+        ventana.set_focus()
+        return True
+    except Exception:
+        pass
+    return False
+
+def kill_steamvr():
+    vr_processes = ["vrmonitor.exe", "vrserver.exe", "vrcompositor.exe", "vrdashboard.exe"]
+    for proc in psutil.process_iter(['name']):
+        try:
+            if proc.info['name'] and proc.info['name'].lower() in vr_processes:
+                proc.kill()
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+
 class LauncherApi:
     def cancel(self):
         try:
             webview.windows[0].destroy()
         except:
             pass
-        # os._exit garantiza que todos los hilos en segundo plano mueran instantáneamente
         os._exit(0)
 
     def set_vr_mode(self):
@@ -32,9 +59,9 @@ class LauncherApi:
                 if os.path.exists(D3D9_DLL):
                     os.remove(D3D9_DLL)
                 os.rename(D3D9_BAK, D3D9_DLL)
-            self.run_game()
+            self.run_game(is_vr=True)
         except PermissionError:
-            webview.windows[0].evaluate_js('showMessage("Error de Permisos: Ejecuta como Administrador o mueve el juego fuera de Archivos de Programa.", "error")')
+            webview.windows[0].evaluate_js('showMessage("Permission error: Run as Administrator.", "error")')
         except Exception as e:
             escaped_error = str(e).replace('"', '\\"')
             webview.windows[0].evaluate_js(f'showMessage("Error: {escaped_error}", "error")')
@@ -45,86 +72,74 @@ class LauncherApi:
                 if os.path.exists(D3D9_BAK):
                     os.remove(D3D9_BAK)
                 os.rename(D3D9_DLL, D3D9_BAK)
-            self.run_game()
+            self.run_game(is_vr=False)
         except PermissionError:
-            webview.windows[0].evaluate_js('showMessage("Error de Permisos: Ejecuta como Administrador o mueve el juego fuera de Archivos de Programa.", "error")')
+            webview.windows[0].evaluate_js('showMessage("Permission error: Run as Administrator.", "error")')
         except Exception as e:
             escaped_error = str(e).replace('"', '\\"')
             webview.windows[0].evaluate_js(f'showMessage("Error: {escaped_error}", "error")')
 
-    def run_game(self):
+    def run_game(self, is_vr=False):
         if not os.path.exists(EXE_PATH):
             escaped_path = EXE_PATH.replace("\\", "\\\\")
-            webview.windows[0].evaluate_js(f'showMessage("halo.exe no encontrado en: {escaped_path}", "error")')
+            webview.windows[0].evaluate_js(f'showMessage("halo.exe not found at: {escaped_path}", "error")')
             return
-        
-        # Actualizamos la UI para mostrar que estamos esperando
+
         webview.windows[0].evaluate_js('document.querySelector(".button-group").style.display = "none";')
         webview.windows[0].evaluate_js('document.querySelector(".btn-cancel").style.display = "none";')
-        webview.windows[0].evaluate_js('showMessage("Iniciando y esperando a SteamVR...", "info")')
-        
-        # Ejecutamos la espera en un hilo para no congelar la ventana del launcher
-        threading.Thread(target=self._launch_and_focus, daemon=True).start()
 
-    def _launch_and_focus(self):
+        threading.Thread(target=self._launch_and_focus, args=(is_vr,), daemon=True).start()
+
+    def _launch_and_focus(self, is_vr):
         try:
-            # Iniciamos el proceso del juego y capturamos su PID
-            process = subprocess.Popen([EXE_PATH], cwd=GAME_DIR)
-            pid = process.pid
-            
-            timeout = 45 # Segundos máximos a esperar a que cargue la ventana
+            env = os.environ.copy()
+            env.pop('_MEIPASS2', None)
+
+            if hasattr(sys, '_MEIPASS'):
+                paths = [p for p in env.get('PATH', '').split(os.pathsep) if p != sys._MEIPASS]
+                env['PATH'] = os.pathsep.join(paths)
+
+            DETACHED_PROCESS        = 0x00000008
+            CREATE_NEW_PROCESS_GROUP = 0x00000200
+
+            proc = subprocess.Popen(
+                [EXE_PATH],
+                cwd=GAME_DIR,
+                close_fds=True,
+                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
+                env=env
+            )
+
+            if is_vr:
+                webview.windows[0].evaluate_js('showMessage("Playing Halo CE VR...", "info")')
+                time.sleep(5)
+            else:
+                webview.windows[0].evaluate_js('showMessage("Playing Halo CE...", "info")')
+
+            timeout    = 30
             start_time = time.time()
-            focused = False
+
+            while time.time() - start_time < timeout:
+                if focus_halo_window():
+                    break
+                time.sleep(0.5)
+
+            while is_halo_running():
+                time.sleep(1)
             
-            user32 = ctypes.windll.user32
-            EnumWindowsProc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
-            
-            while time.time() - start_time < timeout and not focused:
-                def foreach_window(hwnd, lParam):
-                    if user32.IsWindowVisible(hwnd):
-                        pid_out = wintypes.DWORD()
-                        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid_out))
-                        if pid_out.value == pid:
-                            # 1. Restaurar la ventana por si arrancó minimizada (SW_RESTORE = 9)
-                            user32.ShowWindow(hwnd, 9)
-                            
-                            # 2. Lógica agresiva para robar el foco a SteamVR
-                            foreground_hwnd = user32.GetForegroundWindow()
-                            foreground_thread_id = user32.GetWindowThreadProcessId(foreground_hwnd, None)
-                            target_thread_id = user32.GetWindowThreadProcessId(hwnd, None)
-                            
-                            # Si no somos ya la ventana principal, adjuntamos los hilos de input
-                            # Esto burla la protección anti-robo de foco de Windows
-                            if foreground_thread_id != target_thread_id and foreground_thread_id != 0:
-                                user32.AttachThreadInput(foreground_thread_id, target_thread_id, True)
-                                user32.SetForegroundWindow(hwnd)
-                                user32.SetFocus(hwnd)
-                                user32.AttachThreadInput(foreground_thread_id, target_thread_id, False)
-                            else:
-                                user32.SetForegroundWindow(hwnd)
-                                
-                            nonlocal focused
-                            focused = True
-                            return False # Detenemos la enumeración de ventanas
-                    return True
-                
-                # Buscar entre todas las ventanas de Windows
-                user32.EnumWindows(EnumWindowsProc(foreach_window), 0)
-                
-                if not focused:
-                    time.sleep(0.5) # Pausar medio segundo antes de volver a comprobar
-                    
+            if is_vr:
+                kill_steamvr()
+                time.sleep(1.5)
+
         except Exception as e:
-            print(f"Error en _launch_and_focus: {e}")
+            print(f"Error in _launch_and_focus: {e}")
         finally:
-            # Dar 1 segundo para que la ventana se asiente gráficamente y cerrar el launcher
-            time.sleep(1)
             self.cancel()
 
 
 HTML_CONTENT = """
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Halo Launcher</title>
@@ -276,15 +291,15 @@ HTML_CONTENT = """
         
         <div class="button-group no-drag">
             <button onclick="callApi('set_vr_mode')" class="btn btn-vr">
-                INICIAR MODO VR
+                START VR MODE
             </button>
             <button onclick="callApi('set_original_mode')" class="btn btn-flat">
-                MODO ORIGINAL (PLANO)
+                ORIGINAL MODE (FLAT)
             </button>
         </div>
         
         <button onclick="callApi('cancel')" class="btn btn-cancel no-drag">
-            CANCELAR
+            CANCEL
         </button>
         
         <div id="error-box"></div>
@@ -305,17 +320,14 @@ HTML_CONTENT = """
             box.style.display = 'block';
             
             if (type === 'info') {
-                // Estilos para mensajes de carga/información
                 box.style.color = 'var(--vr-color)';
                 box.style.borderColor = 'var(--vr-color-dim)';
                 box.style.backgroundColor = 'var(--vr-color-bg)';
             } else {
-                // Estilos para errores
                 box.style.color = 'var(--cancel-color)';
                 box.style.borderColor = 'var(--cancel-color-dim)';
                 box.style.backgroundColor = 'var(--cancel-color-bg)';
                 
-                // Ocultar el error después de 5 segundos
                 setTimeout(() => {
                     box.style.display = 'none';
                 }, 5000);

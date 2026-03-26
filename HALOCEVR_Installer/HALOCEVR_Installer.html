@@ -276,7 +276,7 @@
                 chimera_title: "CHIMERA", chimera_sub: "FASE 2 DE 6", chimera_desc: "Motor de interpolación para suavizar el movimiento (framerate desbloqueado). Reduce drásticamente el mareo en VR.", loading_chimera: "CONFIGURANDO MOTOR...",
                 laa_title: "PARCHE LAA", laa_sub: "FASE 3 DE 6", laa_desc: "Large Address Aware. Permite al juego utilizar hasta 4GB de RAM, necesario para evitar cierres inesperados.", loading_laa: "PARCHEANDO MEMORIA...",
                 audio_title: "AUDIO 3D", audio_sub: "FASE 4 DE 6", audio_desc: "HRTF (Head-Related Transfer Function). Simulación espacial de audio para auriculares VR.", loading_audio: "INICIALIZANDO AUDIO...",
-                refined_title: "HALO REFINED", refined_sub: "FASE 5 DE 6", refined_desc: "Proyecto para restaurar la estética y corregir errores del port de Gearbox para estar 1:1 con Xbox. Se hará un respaldo seguro de tu carpeta MAPS y se mejorará la interfaz de VR.", loading_refined: "DESCARGANDO MAPAS (1.2GB)...",
+                refined_title: "HALO RESTORED", refined_sub: "FASE 5 DE 6", refined_desc: "Proyecto para restaurar la estética y corregir errores del juego adaptado a la versión en español (1:1 con Xbox). Se hará un respaldo seguro de tu carpeta MAPS y se mejorará la interfaz de VR.", loading_refined: "DESCARGANDO MAPAS (1.2GB)...",
                 shortcut_title: "ACCESO DIRECTO", shortcut_sub: "FASE 6 DE 6", shortcut_desc: "Creando acceso directo 'Halo Launcher' en tu escritorio. Este paso es automático y te permitirá iniciar el juego fácilmente.", loading_shortcut: "CREANDO LAUNCHER...",
                 final_title: "COMPLETADO", final_sub: "SISTEMA LISTO", final_desc: "Todos los componentes han sido instalados. Se ha generado un acceso directo en tu escritorio para iniciar tu juego. ¡Disfruta la experiencia, Spartan!", btn_close: "CERRAR INSTALADOR",
                 btn_install: "INSTALAR", btn_skip: "OMITIR", btn_cancel: "CANCELAR INSTALACIÓN", status_wait: "Esperando comando...",
@@ -288,7 +288,7 @@
                 modal_launcher_desc: "<span class='text-terminal-red font-bold'>DEBES iniciar el juego desde el nuevo Launcher</span>. De lo contrario, el Flood aparecerá en la puerta de tu habitación (mentira, pero causarás bugs extraños que el launcher solventa).",
                 modal_launcher_btn: "SALIR AL ESCRITORIO",
                 modal_refined_title: "ADVERTENCIA: MULTIJUGADOR",
-                modal_refined_desc: "Si instalas Halo Refined, es muy probable que <span class='text-terminal-red font-bold'>no puedas acceder al multijugador</span> debido a que modifica los mapas originales. ¿Deseas continuar?",
+                modal_refined_desc: "Si instalas Halo Restored, es muy probable que <span class='text-terminal-red font-bold'>no puedas acceder al multijugador</span> debido a que modifica los mapas originales. ¿Deseas continuar?",
                 modal_btn_yes: "SÍ, INSTALAR",
                 modal_btn_no: "CANCELAR"
             },
@@ -297,7 +297,7 @@
                 splash_title: "HALO CE VR", splash_sub: "INSTALLATION UTILITY", splash_desc: "This automated system will configure the necessary components for Virtual Reality in Halo: Combat Evolved. Ensure you have a clean copy of the game.", btn_start: "START PROCESS",
                 folder_title: "LOCATION", folder_sub: "ROOT DIRECTORY", folder_desc: "Select the folder where 'Halo Custom Edition' or 'Halo PC' is installed (ensure you have a valid installation from the original disc or web installer). The system will look for 'halo.exe'.", btn_select: "SELECT PATH",
                 credits_title: "CREDITS", credits_sub: "MODDING COMMUNITY", credits_desc: "This installer is made possible by the incredible work of independent developers. We utilize 7-Zip technology for file decompression. Please support the original creators by checking out their repositories.", btn_thanks: "THANKS & CONTINUE",
-                core_title: "VR CORE", core_sub: "PHASE 1 OF 6", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
+                core_title: "VR CORE", sub: "PHASE 1 OF 6", core_desc: "Installation of the VR rendering engine and update to version 1.0.10. Critical for stereoscopic rendering.", loading_core: "DOWNLOADING RESOURCES...",
                 chimera_title: "CHIMERA", chimera_sub: "PHASE 2 OF 6", chimera_desc: "Interpolation engine for unlocked framerates. Drastically reduces motion sickness in VR.", loading_chimera: "CONFIGURING ENGINE...",
                 laa_title: "LAA PATCH", laa_sub: "PHASE 3 OF 6", laa_desc: "Large Address Aware. Allows the game to utilize up to 4GB of RAM, preventing crashes.", loading_laa: "PATCHING MEMORY...",
                 audio_title: "3D AUDIO", audio_sub: "PHASE 4 OF 6", audio_desc: "HRTF (Head-Related Transfer Function). Spatial audio simulation for VR headsets.", loading_audio: "INITIALIZING AUDIO...",
@@ -504,11 +504,11 @@
                     <div class="mt-8 flex flex-col gap-4 w-full max-w-sm anim-slide-in delay-2">
                         <button onclick="setLanguage('en')" class="btn-lang">
                             <span class="font-tech text-xl tracking-widest block">ENGLISH</span>
-                            <span class="text-xs text-zinc-500">DEFAULT INTERFACE</span>
+                            <span class="text-xs text-zinc-500">DEFAULT INTERFACE (INSTALLS HALO REFINED)</span>
                         </button>
                         <button onclick="setLanguage('es')" class="btn-lang">
                             <span class="font-tech text-xl tracking-widest block">ESPAÑOL</span>
-                            <span class="text-xs text-zinc-500">INTERFAZ EN ESPAÑOL</span>
+                            <span class="text-xs text-zinc-500">INTERFAZ EN ESPAÑOL (INSTALA HALO RESTORED)</span>
                         </button>
                     </div>
                 `;
@@ -570,10 +570,10 @@
                         </div>
                         <div onclick="openUrl('https://www.proxeninc.net/Halo/Refined/')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-white font-tech text-lg">Halo Refined</span>
+                                <span class="text-white font-tech text-lg">Refined / Restored</span>
                                 <i class="ph ph-arrow-up-right text-white/30 group-hover:text-white transition-colors"></i>
                             </div>
-                            <div class="text-white/50 text-xs">by Proxeninc / Community</div>
+                            <div class="text-white/50 text-xs">by Proxeninc / Aerocatia</div>
                         </div>
                         <div onclick="openUrl('https://github.com/ThreeDeeJay/dsoal')" class="p-4 border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/30 transition-all cursor-pointer group rounded-sm">
                             <div class="flex justify-between items-center mb-1">
@@ -634,7 +634,8 @@
 
             if (window.pywebview) {
                 let stage = { installCore: 1, installChimera: 2, installLAA: 3, installAudio: 4, installRefined: 5, installShortcut: 6 }[actionName] || 0;
-                window.pywebview.api.run_stage(stage);
+                // Enviamos currentLang a la API de Python
+                window.pywebview.api.run_stage(stage, currentLang);
             } else {
                 simulateProgress();
             }
@@ -692,7 +693,7 @@
                 return;
             }
 
-            // 2. POPUP ANTES DE REFINED
+            // 2. POPUP ANTES DE REFINED / RESTORED
             if (actionName === 'installRefined') {
                 showCustomModal(
                     text.modal_refined_title,

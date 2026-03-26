@@ -1,4 +1,8 @@
-.ico*
+*.ico
 output/*
 HaloLauncher.exe
 HaloCEVR_OfflineInstaller/*
+LauncherBuild.txt
+OfflineInstallerBuild.txt
+OnlineInstallerBuild.txt
+*.exe

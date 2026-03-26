@@ -16,6 +16,7 @@ URL_HALO_VR = "https://github.com/LivingFray/HaloCEVR/releases/download/1.4.0/Ha
 URL_CHIMERA = "https://github.com/SnowyMouse/chimera/releases/download/1.0.0r1200/chimera-1.0.0r1200.7z"
 URL_DSOAL = "https://github.com/ThreeDeeJay/dsoal/releases/download/0.9.6/DSOAL+HRTF.zip"
 URL_REFINED = "https://www.proxeninc.net/Halo/Refined/Refined%20V5%20Download/halo_refined_retail_en_v5.01.7z"
+URL_RESTORED = "https://github.com/Aerocatia/halopc-restored/releases/download/r220/es-halopc-restored-retail-shared-r220.7z"
 
 # Expected local filenames
 PATCH_EXE_NAME = "halopc-patch-1.0.10.exe"
@@ -76,7 +77,7 @@ class Api:
                     if 'audio' in self.installed_mods:
                         f.write("- Audio 3D (DSOAL): Bibliotecas HRTF espaciales configuradas con alsoft.ini.\n")
                     if 'refined' in self.installed_mods:
-                        f.write("- Halo Refined: Mapas originales respaldados, campaña actualizada y HUD adaptado para VR.\n")
+                        f.write("- Halo Restored: Mapas originales respaldados, campaña actualizada al español y HUD adaptado para VR.\n")
                     if 'shortcut' in self.installed_mods:
                         f.write("- Launcher Integrado: Se ha copiado 'Halo Launcher.exe' y creado un acceso directo en el escritorio.\n")
                     f.write("\n¡El proceso ha finalizado correctamente! Ya puedes ejecutar el juego.\n")
@@ -111,21 +112,22 @@ class Api:
         if 'window' in globals() and window:
             window.evaluate_js(f'updateProgress({percent})')
 
-    def run_stage(self, stage_num):
+    def run_stage(self, stage_num, lang='en'):
+        """Runs the specific stage. Accepts language to determine specific mod versions."""
         if not self.game_path:
             self.log("Error: Path not defined.")
             return
-        thread = threading.Thread(target=self._execute_stage, args=(stage_num,))
+        thread = threading.Thread(target=self._execute_stage, args=(stage_num, lang))
         thread.start()
 
-    def _execute_stage(self, stage_num):
+    def _execute_stage(self, stage_num, lang='en'):
         start_time = time.time()
         try:
             if stage_num == 1: self._stage_1_core_vr()
             elif stage_num == 2: self._stage_2_chimera()
             elif stage_num == 3: self._stage_3_laa()
             elif stage_num == 4: self._stage_4_audio()
-            elif stage_num == 5: self._stage_5_refined()
+            elif stage_num == 5: self._stage_5_refined(lang)
             elif stage_num == 6: self._stage_6_shortcut()
             
             elapsed = time.time() - start_time
@@ -350,18 +352,27 @@ class Api:
             f.write(alsoft_content)
         self.installed_mods.append('audio')
 
-    def _stage_5_refined(self):
-        self.log("--- MODULE 5: HALO REFINED ---")
+    def _stage_5_refined(self, lang):
+        if lang == 'es':
+            self.log("--- MODULE 5: HALO RESTORED (SPANISH) ---")
+            archive_url = URL_RESTORED
+            archive_name = "halo_restored.7z"
+            ext_folder_name = "Restored_Extracted"
+        else:
+            self.log("--- MODULE 5: HALO REFINED (ENGLISH) ---")
+            archive_url = URL_REFINED
+            archive_name = "halo_refined.7z"
+            ext_folder_name = "Refined_Extracted"
+
+        archive_7z = os.path.join(TEMP_DIR, archive_name)
+        if not os.path.exists(archive_7z): 
+            self._download_file(archive_url, archive_7z)
         
-        refined_7z = os.path.join(TEMP_DIR, "halo_refined.7z")
-        if not os.path.exists(refined_7z): 
-            self._download_file(URL_REFINED, refined_7z)
-        
-        ext_refined = os.path.join(TEMP_DIR, "Refined_Extracted")
+        ext_refined = os.path.join(TEMP_DIR, ext_folder_name)
         if os.path.exists(ext_refined): 
             shutil.rmtree(ext_refined)
             
-        self._extract_7z_robust(refined_7z, ext_refined)
+        self._extract_7z_robust(archive_7z, ext_refined)
 
         # 1. Backup original MAPS folder
         maps_dir = os.path.join(self.game_path, "MAPS")
@@ -374,18 +385,35 @@ class Api:
             self.log("MAPS_original backup exists or MAPS not found. Skipping.")
 
         # 2. Copy mod files over MAPS
-        self.log("Installing Halo Refined maps...")
-        source_maps = None
-        for root, dirs, files in os.walk(ext_refined):
-            if any(f.lower().endswith(".map") for f in files):
-                source_maps = root
-                break
-                
-        if source_maps:
-            shutil.copytree(source_maps, maps_dir, dirs_exist_ok=True)
-            self.log("Refined MAPS copied successfully.")
+        self.log("Installing updated maps...")
+        
+        if lang == 'es':
+            # Restored: The maps are loose in the root of the extracted 7z file
+            maps_copied = False
+            for item in os.listdir(ext_refined):
+                if item.lower().endswith(".map"):
+                    src_file = os.path.join(ext_refined, item)
+                    dst_file = os.path.join(maps_dir, item)
+                    shutil.copy2(src_file, dst_file)
+                    maps_copied = True
+                    
+            if maps_copied:
+                self.log("Halo Restored MAPS copied successfully.")
+            else:
+                self.log("WARNING: No .map files found in Restored download.")
         else:
-            self.log("WARNING: No .map files found in Refined download.")
+            # Refined: The maps are often inside a subfolder
+            source_maps = None
+            for root, dirs, files in os.walk(ext_refined):
+                if any(f.lower().endswith(".map") for f in files):
+                    source_maps = root
+                    break
+                    
+            if source_maps:
+                shutil.copytree(source_maps, maps_dir, dirs_exist_ok=True)
+                self.log("Refined MAPS copied successfully.")
+            else:
+                self.log("WARNING: No .map files found in Refined download.")
 
         # 3. Apply HUD/Crosshair Fix for VR
         vr_config_path = os.path.join(self.game_path, "VR", "config.txt")
