@@ -17,7 +17,7 @@
 
 ## Overview
 
-This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, and spatial audio — in a single automated pass. 
+This installer handles the downloading, extraction, and configuration of every required VR module — VR core, memory optimization, FPS interpolation, spatial audio, and community enhancement projects — in a single automated pass. It is available in both a lightweight online version and a comprehensive offline archival version.
 
 ---
 
@@ -26,7 +26,15 @@ This installer handles the downloading, extraction, and configuration of every r
 ### Immersive Interface
 The UI draws from UNSC terminal aesthetics to keep the experience on-theme, clean, and polished throughout the installation process.
 
-### 4-in-1 Automated Installation
+### Language-Tailored Immersion (New!)
+The installer now features automatic project integration based on your language:
+* **English:** Installs with the incredible **Halo Refined** for the purest original Xbox experience.
+* **Spanish:** Installs with **Halo Restored** for the absolute best localized voices and texts.
+
+### Offline Archival Installer (New!)
+A fully standalone 1.7GB Offline Installer is now available. It contains absolutely every required file, module, and mod pre-bundled. No internet is required during setup, making it the perfect frozen archival copy for the future.
+
+### Automated Installation Modules
 
 | Module | Description |
 |---|---|
@@ -34,8 +42,9 @@ The UI draws from UNSC terminal aesthetics to keep the experience on-theme, clea
 | **Chimera Engine** | Frame interpolation to eliminate motion sickness and unlock FPS |
 | **LAA Patch** | Enables the game to address up to 4 GB of RAM, preventing crashes |
 | **DSOAL (3D Audio)** | HRTF implementation for accurate spatial audio inside VR headsets |
+| **Refined / Restored** | Restores classic Xbox graphics and provides high-quality localization |
 
-### Dual-Mode Launcher (New!)
+### Dual-Mode Launcher
 Includes an optional custom launcher that lets you seamlessly switch between **VR Mode** and standard **Flat Mode**. If you choose not to install the launcher add-on, the game will automatically default to VR mode.
 
 ---
@@ -45,9 +54,9 @@ Includes an optional custom launcher that lets you seamlessly switch between **V
 Installation has been designed to be as painless as possible.
 
 1. Head to the **[Releases](../../releases)** section on the right sidebar of this repository.
-2. Download the latest version of the installer.
-3. Run the application.
-4. In the interface, select the **root folder** where your game is installed. A clean copy of **Halo Custom Edition** or **Halo PC** is required.
+2. Download your preferred version: the lightweight online installer or the complete offline installer.
+3. Run the application (Administrator rights are required to apply the mandatory base game patch).
+4. In the interface, select your preferred language (English or Spanish) and the **root folder** where your game is installed. A clean copy of **Halo Custom Edition** or **Halo PC** is required.
 5. Click **Install** and let the automated system handle the rest.
 
 > **Note:** Once installation finishes, close the installer. If you installed the launcher, use it to select your mode. Otherwise, just put on your headset and launch the game as you normally would to play in VR!
@@ -73,6 +82,8 @@ This installer is a bridge that unifies the outstanding work of the modding comm
 | [Chimera](https://github.com/SnowyMouse/chimera) | SnowyMouse |
 | [HoriZon](#) | Community Tool |
 | [DSOAL](https://github.com/ThreeDeeJay/dsoal) | ThreeDeeJay |
+| [Halo Refined](#) | Refined Team |
+| [Halo Restored](#) | Restored Team |
 
 ---
 
